@@ -16,15 +16,69 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+body,
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f0f0;
 }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+header {
+  padding-bottom: 80px;
+}
+
+.filter-blue {
+  filter: invert(29%) sepia(82%) saturate(6364%) hue-rotate(188deg) brightness(95%) contrast(101%);
+}
+
+.filter-gray {
+  filter: grayscale(100%);
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Regular.woff2') format('woff2'),
+    url('/fonts/Satoshi-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Bold.woff2') format('woff2'),
+    url('/fonts/Satoshi-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Tambahkan style untuk body atau elemen lain */
+body {
+  font-family: 'Satoshi', sans-serif;
+}
+
 
 @layer utilities {
   .text-balance {
