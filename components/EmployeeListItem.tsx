@@ -1,5 +1,5 @@
 // src/components/EmployeeListItem.tsx
-import { Employee } from '../types/Employee'; 
+import { Employee } from '../store/types/employeeType'; 
 
 interface EmployeeListItemProps {
   employee: Employee;

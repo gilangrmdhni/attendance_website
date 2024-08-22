@@ -42,14 +42,23 @@ const Login = () => {
                 <div className="w-full max-w-md bg-white shadow-md rounded-lg overflow-hidden">
                     {/* Header */}
                     <div className="relative bg-orange-500" style={{ height: '450px' }}>
+                        {/* Logo di kanan atas */}
                         <div className="absolute top-4 right-4">
                             <img src="/icons/logoNUN.png" alt="Logo" className="w-20 h-20 object-contain" />
                         </div>
+
+                        {/* Background Image */}
                         <div className="absolute inset-0 bg-no-repeat bg-cover" style={{ backgroundImage: "url('/images/bgLogin.png')" }}></div>
+
+                        {/* Gambar Baru di Kiri Bawah */}
+                        <div className="absolute bottom-4 left-4">
+                            <img src="/images/iconNun.png" alt="New Image" className="w-25 h-25 object-fill" />
+                        </div>
                     </div>
 
+
                     {/* Form */}
-                    <div className="p-6">
+                    <div className="p-6 py-10">
                         <p className="text-gray-700 text-sm mb-1">Good Morning 👋</p>
                         <h1 className="text-xl font-semibold mb-4">Welcome Back, Login to Continue your activity!</h1>
                         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
