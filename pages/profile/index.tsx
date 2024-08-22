@@ -1,8 +1,8 @@
 import Head from 'next/head';
-import Footer from '../components/Footer';
-import MobileContainer from '../components/MobileContainer';
-import ProfileHeader from '../components/profile/ProfileHeader';
-import ProfileSection from '../components/profile/ProfileSection';
+import Footer from '../../components/Footer';
+import MobileContainer from '../../components/MobileContainer';
+import ProfileHeader from '../../components/profile/ProfileHeader';
+import ProfileSection from '../../components/profile/ProfileSection';
 
 const generalInformationItems = [
   { name: "Employee List" },
@@ -33,13 +33,14 @@ const Profile = () => {
 
       <ProfileHeader />
 
-      <main className="px-4 py-6">
-        <ProfileSection title="General Information" items={generalInformationItems} />
-        <ProfileSection title="Setting" items={settingItems} />
-        <ProfileSection title="About" items={aboutItems} />
-        <ProfileSection title="" items={logoutItem} />
+      <main className="px-4 py-4">
+        <div className='mb-20'>
+          <ProfileSection title="General Information" items={generalInformationItems} />
+          <ProfileSection title="Setting" items={settingItems} />
+          <ProfileSection title="About" items={aboutItems} />
+          <ProfileSection title="" items={logoutItem} />
+        </div>
       </main>
-
       <Footer />
     </MobileContainer>
   );
