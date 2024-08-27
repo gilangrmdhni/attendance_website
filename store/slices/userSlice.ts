@@ -1,8 +1,7 @@
-// store/slices/userSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { RootState } from '../store';
 import { User } from '../types/authTypes';
+import axiosInstance from '../../utils/axiosInstance'; 
 
 export const fetchUser = createAsyncThunk(
   'user/fetchUser',
@@ -15,7 +14,7 @@ export const fetchUser = createAsyncThunk(
     }
 
     try {
-      const response = await axios.get('https://api.attendance.nuncorp.id/api/auth/user', {
+      const response = await axiosInstance.get('/auth/user', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -41,13 +40,14 @@ export const updateUserPicture = createAsyncThunk(
     formData.append('picture', picture);
 
     try {
-      const response = await axios.put('https://api.attendance.nuncorp.id/api/user/update-picture', formData, {
+      const response = await axiosInstance.put('/user/update-picture', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-      return { picture: URL.createObjectURL(picture) };
+      // Assume the API response contains the updated picture URL
+      return response.data.body.picture; 
     } catch (error: any) {
       return rejectWithValue('Failed to update picture');
     }
@@ -91,7 +91,10 @@ const userSlice = createSlice({
       .addCase(updateUserPicture.fulfilled, (state, action) => {
         state.loading = false;
         if (state.user) {
-          state.user.picture = action.payload.picture;
+          state.user = {
+            ...state.user,
+            picture: action.payload, 
+          };
         }
       })
       .addCase(updateUserPicture.rejected, (state, action) => {

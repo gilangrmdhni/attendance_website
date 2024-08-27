@@ -30,7 +30,10 @@ const ProfileHeader = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      dispatch(updateUserPicture(event.target.files[0]));
+      dispatch(updateUserPicture(event.target.files[0])).then(() => {
+        // Optional: Fetch user again to ensure updated picture is fetched
+        dispatch(fetchUser());
+      });
       setIsPopupVisible(false);
     }
   };
@@ -46,8 +49,8 @@ const ProfileHeader = () => {
   }
 
   const profilePictureUrl = user?.picture 
-    ? `https://api.attendance.nuncorp.id/storage/uploads${user.picture}`
-    : '/images/profile-user.png';
+   ? `https://api.attendance.nuncorp.id${user.picture}`
+  : '/images/profile-user.png';
 
   return (
     <header className="bg-primary-blue text-white p-6 rounded-b-3xl text-center">
@@ -55,7 +58,7 @@ const ProfileHeader = () => {
         <span className='font-bold text-2xl'>Profil</span>
         <Image 
           src="/icons/notification.png" 
-          alt="Notification Icon" 
+          alt="Notification Icon"   
           width={24} 
           height={24}
           className="cursor-pointer"

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store/store';
 import { fetchAnnouncements } from '../../store/slices/announcementSlice';
+import Image from 'next/image';
 
 const News: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -33,13 +34,15 @@ const News: React.FC = () => {
   } else if (status === 'succeeded') {
     content = announcements.map((announcement) => {
       // Gabungkan base URL dengan path gambar
-      const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}${announcement.picture}`;
+      const imageUrl = `https://api.attendance.nuncorp.id${announcement.picture}`;
       return (
         <Link key={announcement.id} href={`/news/${announcement.id}`}>
           <div className="flex items-center border-b pb-2 cursor-pointer">
-            <img
+            <Image
               src={imageUrl}
               alt={announcement.title}
+              width={64}
+              height={64} 
               className="w-16 h-16 rounded-md mr-4"
             />
             <div>

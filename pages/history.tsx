@@ -74,7 +74,7 @@ const History = () => {
       <main className="px-4 pb-20">
         {activeTab === 'Attendance' && (
           <>
-            <div className="text-gray-500 text-sm my-2 text-center">AGUSTUS 2024</div>
+            <div className="text-gray-500 text-sm my-2 text-center"></div>
             {historyStatus === 'loading' && <p>Loading attendance data...</p>}
             {historyStatus === 'succeeded' && filteredHistory.length > 0 ? (
               filteredHistory.map((item: HistoryItemType) => (
@@ -95,7 +95,7 @@ const History = () => {
         )}
         {activeTab === 'Time Off' && (
           <>
-            <div className="text-gray-500 text-sm my-2 text-center">AGUSTUS 2024</div>
+            <div className="text-gray-500 text-sm my-2 text-center"></div>
             {requestsStatus === 'loading' && <p>Loading time off requests...</p>}
             {requestsStatus === 'succeeded' && filteredRequests.length > 0 ? (
               filteredRequests.map((item: RequestApprovalType) => (

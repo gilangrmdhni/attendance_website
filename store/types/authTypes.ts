@@ -14,6 +14,7 @@ export interface User {
     picture: string;
     position: Position;
     role: string;
+    nip: number;
 }
 
 export interface AuthState {

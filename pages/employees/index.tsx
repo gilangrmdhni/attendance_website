@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { AppDispatch, RootState } from '../../store/store';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import MobileContainer from '@/components/MobileContainer';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Footer from '@/components/Footer';
+import axiosInstance from '@/utils/axiosInstance';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const EmployeesPage = () => {
     const [divisions, setDivisions] = useState<any[]>([]);
@@ -19,13 +20,8 @@ const EmployeesPage = () => {
 
     useEffect(() => {
         const fetchEmployees = async () => {
-            if (!token) {
-                router.push('/login');
-                return;
-            }
-
             try {
-                const response = await axios.get('https://api.attendance.nuncorp.id/api/userdivision/all', {
+                const response = await axiosInstance.get('/userdivision/all', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -64,24 +60,27 @@ const EmployeesPage = () => {
     return (
         <MobileContainer>
             <div className="bg-blue-800 text-white p-4 rounded-b-3xl">
-                <div className='flex items-center'>
+                <div className='relative flex items-center'>
                     <button onClick={() => router.back()} className='mr-4'>
                         <ArrowLeftIcon className="w-6 h-6" />
                     </button>
                     <h1 className='text-2xl font-bold'>Employee List</h1>
                 </div>
-                <input
-                    type="text"
-                    placeholder="Search employees..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    className="mt-2 p-2 w-full rounded border border-gray-300"
-                />
+                <div className="relative mt-2">
+                    <input
+                        type="text"
+                        placeholder="Search employees..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="p-2 w-full rounded-lg text-gray-500 pl-10 border border-gray-300"
+                    />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                </div>
             </div>
-            <div className="p-4 space-y-4 mb-8">
+            <div className="p-4 space-y-4 mb-20">
                 {filteredDivisions.map((division, index) => (
-                    <div key={index} className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200">
-                        <h2 className="text-xl font-semibold mb-8">{division.division_name}</h2>
+                    <div key={index} className="bg-white shadow-md rounded-lg p-4 border border-gray-200">
+                        <h2 className="text-xl font-semibold">{division.division_name}</h2>
                         <div className="space-y-2">
                             {division.users.map((user: any, userIndex: number) => (
                                 <div key={userIndex} className="flex items-center p-2 border-b border-gray-200 last:border-b-0">
@@ -89,7 +88,7 @@ const EmployeesPage = () => {
                                         <p className="font-medium">{user.full_name}</p>
                                         <p className="text-sm text-gray-600">{user.position}</p>
                                     </div>
-                                    <span className={`w-3 h-3 rounded-full ${getStatusColor(user.attendance)} shadow-inner shadow-opacity-15`}></span>
+                                    <span className={`w-3 h-3 p-1 rounded-full ${getStatusColor(user.attendance)} border-4`}></span>
                                 </div>
                             ))}
                         </div>

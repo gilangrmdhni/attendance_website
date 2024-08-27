@@ -1,3 +1,4 @@
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect, useRef } from 'react';
 
 interface HistoryHeaderProps {
@@ -52,14 +53,15 @@ const HistoryHeader = ({
 
     return (
         <header className="bg-primary-blue text-white p-4 rounded-b-lg relative">
-            <h1 className="text-lg font-semibold">History</h1>
-            <div className="flex items-center mt-4">
+            <h1 className="text-xl font-semibold">History</h1>
+            <div className="flex items-center mt-4 relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                     type="text"
                     placeholder="Search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex-1 p-3 rounded-l-lg border border-gray-300 text-gray-600"
+                    className="flex-1 p-3 pl-10 rounded-l-lg border border-gray-300 text-gray-600"
                 />
                 <button
                     onClick={handleFilterClick}
@@ -68,6 +70,7 @@ const HistoryHeader = ({
                     <img src="/images/filter.png" alt="Filter" className="w-5 h-5" />
                 </button>
             </div>
+
             <div className="flex justify-center mt-4 bg-white p-2 rounded-lg">
                 <button
                     className={`px-4 py-2 rounded-lg mx-2 ${activeTab === 'Attendance' ? 'bg-blue-800 text-white' : 'bg-white text-gray-400'}`}

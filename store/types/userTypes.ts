@@ -4,5 +4,6 @@ interface User {
     name: string;
     workHourTime: string;
     date: string;
+    nip: number;
   }
   
