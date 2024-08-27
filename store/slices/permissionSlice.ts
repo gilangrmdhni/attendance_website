@@ -1,6 +1,7 @@
 // slices/permissionSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosInstance';
+import axios, { AxiosError } from 'axios';
 
 interface PermissionRequest {
     permission: string;
@@ -17,13 +18,10 @@ export const submitPermissionRequest = createAsyncThunk(
         form.append('description', formData.description);
         form.append('dates', formData.dates);
         form.append('attachment', formData.attachment);
-
         const response = await axiosInstance.post('/request/permission', form);
         return response.data;
-
     }
 );
-
 const initialState = {
     data: null as any,
     status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',

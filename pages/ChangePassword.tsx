@@ -37,7 +37,7 @@ const ChangePassword = () => {
 
     setLoading(true);
     try {
-      await axiosInstance.post('/auth/change-password', {
+      await axiosInstance.put('/auth/change-password', {
         new_password: newPassword,
         confirm_password: confirmPassword,
         otp,

@@ -4,11 +4,11 @@ import axiosInstance from '../../utils/axiosInstance';
 
 interface ReimbursementRequest {
     description: string;
-    dates: string; // Pastikan format tanggal sesuai yang diharapkan API
+    dates: string; 
     account: string;
     amount: string;
     trip: string;
-    attachment: File; // Menyesuaikan dengan tipe file
+    attachment: File;
 }
 
 export const submitReimbursementRequest = createAsyncThunk(

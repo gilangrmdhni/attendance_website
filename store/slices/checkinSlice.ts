@@ -23,7 +23,8 @@ export const checkInWFO = createAsyncThunk<
             });
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to check in WFO');
+            const errorMessage = error.response?.data?.error || 'Failed to check in WFO';
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -43,7 +44,8 @@ export const checkInWFAWFH = createAsyncThunk<
             });
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to check in WFA/WFH');
+            const errorMessage = error.response?.data?.error || 'Failed to check in WFA/WFH';
+            return rejectWithValue(errorMessage);
         }
     }
 );

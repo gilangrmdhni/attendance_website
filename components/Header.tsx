@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import axiosInstance from '../utils/axiosInstance';
 import Snackbar from './Snackbar';
-import { fetchUser } from '@/store/slices/userSlice';
 import { ClockIcon } from '@heroicons/react/24/solid';
+import { fetchUser } from '../store/slices/userSlice';
+
 
 const Header = () => {
     const [checkinAt, setCheckinAt] = useState<string | null>(null);
+    const [checkoutAt, setCheckoutAt] = useState<string | null>(null);
     const [elapsedTime, setElapsedTime] = useState<number>(0);
     const [checkinType, setCheckinType] = useState<'WFO' | 'WFA/WFH'>('WFO');
     const [checkoutLatitude, setCheckoutLatitude] = useState<number | null>(null);
@@ -16,58 +18,89 @@ const Header = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
     const [warningMessage, setWarningMessage] = useState<string | null>(null);
-    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true); // State to manage button disabling
-    const [checkoutSuccessful, setCheckoutSuccessful] = useState<boolean>(false); // State to manage checkout success
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+    const [checkoutSuccessful, setCheckoutSuccessful] = useState<boolean>(false);
     const { user, loading } = useSelector((state: RootState) => state.user);
     const { token } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [confirmCheckout, setConfirmCheckout] = useState(false);
 
-    useEffect(() => {
-        const fetchTimer = async () => {
-            try {
-                const response = await axiosInstance.get('/attendance/timer');
-                const { checkin_at, checkin_type } = response.data.body;
-                setCheckinAt(checkin_at);
-                setCheckinType(checkin_type === 'work from office' ? 'WFO' : 'WFA/WFH');
-
-                // Load from localStorage
-                const storedCheckoutSuccessful = localStorage.getItem('checkoutSuccessful') === 'true';
-                setCheckoutSuccessful(storedCheckoutSuccessful);
-
-                if (!storedCheckoutSuccessful) {
-                    setButtonDisabled(false); // Enable button after check-in
+    const fetchTimer = async () => {
+        try {
+            const response = await axiosInstance.get('/attendance/timer');
+            console.log("API Response:", response.data); // Debugging response
+            
+            if (response.data && response.data.body) {
+                const { checkin, checkout } = response.data.body;
+    
+                console.log("Checkin At from API:", checkin?.checkin_at); // Debugging checkin_at
+    
+                if (checkin?.checkin_at) {
+                    setCheckinAt(checkin.checkin_at);
+                    setCheckinType(checkin.checkin_type === 'work from office' ? 'WFO' : 'WFA/WFH');
+                    setButtonDisabled(checkout ? true : false); // Enable or disable button based on checkout
+                } else {
+                    setCheckinAt(null);
+                    setButtonDisabled(true); // Disable button if checkinAt is null
                 }
-            } catch (error) {
-                console.error("Error fetching timer:", error);
+    
+                if (checkout) {
+                    setCheckoutAt(checkout);
+                    setButtonDisabled(true);
+                } else {
+                    setCheckoutAt(null);
+                    setButtonDisabled(false);
+                }
+            } else {
+                console.error("No data body found in response.");
+                setCheckinAt(null);
+                setCheckoutAt(null);
+                setButtonDisabled(true); // Ensure button is disabled if no data
             }
-        };
-
+        } catch (error) {
+            console.error("Error fetching timer:", error);
+            setCheckinAt(null);
+            setCheckoutAt(null);
+            setButtonDisabled(true); // Ensure button is disabled on error
+        }
+    };
+    
+    useEffect(() => {
         fetchTimer();
     }, []);
 
     useEffect(() => {
         if (token) {
-            dispatch(fetchUser());
+          dispatch(fetchUser());
         }
-    }, [dispatch, token]);
+      }, [dispatch, token]);
+    
 
-    useEffect(() => {
+      useEffect(() => {
         let interval: NodeJS.Timeout | undefined;
-
-        if (checkinAt && !checkoutSuccessful) {
+    
+        if (checkinAt && !checkoutAt && !checkoutSuccessful) {
             const checkinDate = new Date(checkinAt);
-
+    
+            if (isNaN(checkinDate.getTime())) {
+                console.error("Invalid Checkin Date:", checkinDate);
+                return;
+            }
+    
             interval = setInterval(() => {
                 const now = new Date();
                 const diff = now.getTime() - checkinDate.getTime();
                 setElapsedTime(Math.floor(diff / 1000));
             }, 1000);
         }
-
+    
         return () => {
-            if (interval) clearInterval(interval);
+            if (interval) {
+                clearInterval(interval);
+            }
         };
-    }, [checkinAt, checkoutSuccessful]); // Stop timer if checkout is successful
+    }, [checkinAt, checkoutAt, checkoutSuccessful]);    
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -78,15 +111,33 @@ const Header = () => {
                 },
                 (error) => {
                     console.error("Error getting location:", error);
+                    setSnackbarMessage("Error getting location.");
+                    setSnackbarType('error');
+                    setSnackbarVisible(true);
                 }
             );
+        } else {
+            setSnackbarMessage("Geolocation is not supported by this browser.");
+            setSnackbarType('error');
+            setSnackbarVisible(true);
         }
     }, []);
 
+    useEffect(() => {
+        console.log("Checkin At:", checkinAt);
+        console.log("Elapsed Time:", elapsedTime);
+    }, [checkinAt, elapsedTime]);
+
     const formatTime = (seconds: number) => {
+        if (isNaN(seconds) || seconds < 0) {
+            console.error("Invalid seconds value:", seconds);
+            return "00:00:00";
+        }
+
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = seconds % 60;
+
         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     };
 
@@ -98,13 +149,15 @@ const Header = () => {
             return;
         }
 
-        const workHours = 8 * 3600; // 8 jam dalam detik
-        if (elapsedTime < workHours) {
-            setWarningMessage("Anda belum mencapai 8 jam kerja. Checkout mungkin akan mempengaruhi laporan Anda.");
+        const workHours = 8 * 3600;
+        if (elapsedTime < workHours && !confirmCheckout) {
+            setShowConfirmDialog(true);  // Tampilkan dialog konfirmasi
+            return;
         } else {
             setWarningMessage(null);
         }
 
+        // Proses checkout setelah konfirmasi
         const checkoutAt = new Date().toISOString();
         const message = "Saya Pamit";
 
@@ -117,14 +170,14 @@ const Header = () => {
             setSnackbarMessage("Checkout successful!");
             setSnackbarType('success');
             setSnackbarVisible(true);
-            setCheckoutSuccessful(true); // Set checkout successful state
-            setButtonDisabled(true); // Disable button after checkout
-            setElapsedTime(0); // Reset timer to zero
-            setCheckinAt(null); // Clear check-in time
+            setCheckoutSuccessful(true);
+            setButtonDisabled(true);
+            setElapsedTime(0);
+            setCheckinAt(null);
+            setCheckoutAt(checkoutAt);
 
-            // Save to localStorage
             localStorage.setItem('checkoutSuccessful', 'true');
-            localStorage.removeItem('checkinAt');
+            localStorage.removeItem('checkinAt'); // Remove checkinAt from localStorage
         } catch (error) {
             console.error("Error during checkout:", error);
             setSnackbarMessage("Error during checkout. Please try again.");
@@ -169,7 +222,6 @@ const Header = () => {
 
     return (
         <>
-            {/* Snackbar */}
             <Snackbar
                 message={warningMessage || snackbarMessage}
                 type={warningMessage ? 'warning' : snackbarType}
@@ -219,15 +271,47 @@ const Header = () => {
                             <span className='text-gray-400'>Work hour time</span>
                         </div>
                         <button
-                            onClick={checkinAt && !checkoutSuccessful ? () => handleCheckout() : undefined}
-                            disabled={!checkinAt || checkoutSuccessful}
-                            className={`mt-4 px-4 py-2 rounded-lg ${checkinAt && !checkoutSuccessful ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                            className={`${buttonDisabled
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-primary-blue'
+                                } text-white font-semibold py-2 px-4 rounded-lg mt-4 w-full`}
+                            onClick={handleCheckout}
+                            disabled={buttonDisabled}
                         >
-                            Checkout
+                            {checkoutSuccessful ? 'Sudah Checkout' : 'Checkout'}
                         </button>
                     </div>
                 </div>
             </header>
+
+            {showConfirmDialog && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg p-8 max-w-lg mx-auto">
+                        <p className="text-lg font-semibold mb-4">Peringatan</p>
+                        <p className="text-gray-600 mb-6">
+                            Anda belum menyelesaikan waktu kerja 8 jam. Apakah Anda yakin ingin checkout?
+                        </p>
+                        <div className="flex justify-end">
+                            <button
+                                className="bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg mr-2"
+                                onClick={() => setShowConfirmDialog(false)}
+                            >
+                                Batalkan
+                            </button>
+                            <button
+                                className="bg-primary-blue text-white font-semibold py-2 px-4 rounded-lg"
+                                onClick={() => {
+                                    setConfirmCheckout(true);
+                                    setShowConfirmDialog(false);
+                                    handleCheckout();  // Lanjutkan checkout setelah konfirmasi
+                                }}
+                            >
+                                Checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

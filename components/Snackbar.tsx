@@ -1,6 +1,6 @@
 // components/Snackbar.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 interface SnackbarProps {
     message: string;
@@ -17,7 +17,7 @@ const Snackbar: React.FC<SnackbarProps> = ({ message, type, visible, onClose }) 
         if (visible) {
             const timer = setTimeout(() => {
                 onClose();
-            }, 5000); // Snackbar will be visible for 5 seconds
+            }, 5000); 
 
             return () => clearTimeout(timer);
         }

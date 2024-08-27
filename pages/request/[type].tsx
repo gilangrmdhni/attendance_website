@@ -5,20 +5,21 @@ import MobileContainer from '../../components/MobileContainer';
 import DynamicFormWithHeader from '../../components/forms/DynamicForm';
 import { FormConfig } from '../../store/types/formTypes';
 
+
 const formConfigurations: Record<string, FormConfig> = {
-    cuti: {
+    timeoff: {
         title: 'Cuti Form',
         fields: [
-            { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
-            { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
-            { type: 'textarea', label: 'Keterangan', name: 'description' }
+            { type: 'date', label: 'Pilih Tanggal', name: 'dates' },
+            { type: 'textarea', label: 'Keterangan', name: 'description' },
+            { type: 'file', label: 'Attachment', name: 'attachment' }
         ],
     },
-    lembur: {
+    overtime: {
         title: 'Lembur Form',
         fields: [
-            { type: 'date', label: 'Tanggal', name: 'date' },
-            { type: 'text', label: 'Jumlah Jam', name: 'hours' },
+            { type: 'date', label: 'Tanggal', name: 'dates' },
+            { type: 'number', label: 'Jumlah Jam', name: 'overtime_hours' },
             { type: 'textarea', label: 'Keterangan', name: 'description' }
         ],
     },
@@ -26,18 +27,24 @@ const formConfigurations: Record<string, FormConfig> = {
         title: 'Reimbursement Form',
         fields: [
             { type: 'text', label: 'Nominal', name: 'amount' },
-            { type: 'text', label: 'Deskripsi', name: 'description' },
-            { type: 'file', label: 'Attachment', name: 'attachment' } 
+            { type: 'textarea', label: 'Deskripsi', name: 'description' },
+            { type: 'text', label: 'Account', name: 'account' },
+            { type: 'text', label: 'Trip', name: 'trip' },
+            { type: 'date', label: 'Dates', name: 'dates' },
+            { type: 'file', label: 'Attachment', name: 'attachment' }
         ],
     },
-    izin: {
+    permission: {
         title: 'Izin Form',
         fields: [
-            { type: 'date', label: 'Tanggal', name: 'date' },
-            { type: 'textarea', label: 'Alasan', name: 'reason' }
+            { type: 'text', label: 'Alasan', name: 'permission' },
+            { type: 'date', label: 'Tanggal', name: 'dates' },
+            { type: 'textarea', label: 'Deskripsi', name: 'description' },
+            { type: 'file', label: 'Attachment', name: 'attachment' }
         ],
     },
 };
+
 
 const RequestForm = () => {
     const router = useRouter();
@@ -58,12 +65,14 @@ const RequestForm = () => {
                 <title>{formConfig.title}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             </Head>
-            <main className="pt-4">
-                <DynamicFormWithHeader
-                    title={formConfig.title}
-                    fields={formConfig.fields}
-                    onSubmit={handleSubmit} 
-                />
+            <main>
+                <div className="mb-20">
+                    <DynamicFormWithHeader
+                        title={formConfig.title}
+                        fields={formConfig.fields}
+                        onSubmit={handleSubmit}
+                    />
+                </div>
             </main>
             <Footer />
         </MobileContainer>

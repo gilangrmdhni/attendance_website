@@ -18,16 +18,16 @@ const RequestHeader: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                         <div
                             className="bg-white p-4 rounded-lg border-2 flex flex-col items-center cursor-pointer"
-                            onClick={() => handleMenuClick('cuti')}
+                            onClick={() => handleMenuClick('timeoff')}
                         >
-                            <img src="/icons/cuti.png" alt="Cuti" className="w-10 h-10 mb-2" />
+                            <img src="/icons/cuti.png" alt="timeoff" className="w-10 h-10 mb-2" />
                             <span className="text-sm font-medium text-blue-800">Cuti</span>
                         </div>
                         <div
                             className="bg-white p-4 rounded-lg border-2 flex flex-col items-center cursor-pointer"
-                            onClick={() => handleMenuClick('lembur')}
+                            onClick={() => handleMenuClick('overtime')}
                         >
-                            <img src="/icons/lembur.png" alt="Lembur" className="w-10 h-10 mb-2" />
+                            <img src="/icons/lembur.png" alt="overtime" className="w-10 h-10 mb-2" />
                             <span className="text-sm font-medium text-blue-800">Lembur</span>
                         </div>
                         <div
@@ -39,9 +39,9 @@ const RequestHeader: React.FC = () => {
                         </div>
                         <div
                             className="bg-white p-4 rounded-lg border-2 flex flex-col items-center cursor-pointer"
-                            onClick={() => handleMenuClick('izin')}
+                            onClick={() => handleMenuClick('permission')}
                         >
-                            <img src="/icons/izin.png" alt="Izin" className="w-10 h-10 mb-2" />
+                            <img src="/icons/izin.png" alt="permission" className="w-10 h-10 mb-2" />
                             <span className="text-sm font-medium text-blue-800">Izin</span>
                         </div>
                     </div>
