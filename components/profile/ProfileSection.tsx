@@ -44,6 +44,9 @@ const ProfileSection = ({ title, items }: { title: string; items: any[] }) => {
         case 'Change Password':
           router.push('/ChangePassword');
           break;
+        case 'Notification':
+          router.push('/Notifications');
+          break;
         default:
           break;
       }

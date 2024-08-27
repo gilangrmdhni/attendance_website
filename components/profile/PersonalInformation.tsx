@@ -41,7 +41,9 @@ const PersonalInformation = () => {
                     <span className="font-semibold">Phone Number:</span> {user?.phone_number}
                 </div>
                 <div className="text-gray-700 mb-2">
-                    <span className="font-semibold">Job Title:</span> {user?.position.name}
+                    <span className="font-semibold">Job Title:</span>
+                     {/* {user?.position.name} */}
+                     On Going
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-gray-700">
                     <div>

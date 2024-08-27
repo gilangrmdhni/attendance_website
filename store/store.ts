@@ -11,6 +11,7 @@ import attendanceReducer from './slices/attendanceSlice';
 import reimbursementReducer from './slices/reimbursementSlice';
 import permissionReducer from './slices/permissionSlice';
 import timeOffReducer from './slices/timeOffSlice';
+import notificationReducer from './slices/notificationSlice';
 import { useDispatch } from 'react-redux';
 
 const store = configureStore({
@@ -27,6 +28,7 @@ const store = configureStore({
     reimbursement: reimbursementReducer,
     permission: permissionReducer,
     timeOff: timeOffReducer,
+    notifications: notificationReducer,
   },
 });
 

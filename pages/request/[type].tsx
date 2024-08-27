@@ -50,13 +50,10 @@ const RequestForm = () => {
     const router = useRouter();
     const { type } = router.query;
 
-    const formConfig = formConfigurations[type as keyof typeof formConfigurations] || formConfigurations.cuti;
+    const formConfig = formConfigurations[type as keyof typeof formConfigurations] || formConfigurations['timeoff'];
 
     const handleSubmit = (formData: FormData) => {
-        // Handle form submission logic here
         console.log('Form data submitted:', formData);
-
-        // You can dispatch actions or make API calls here
     };
 
     return (
