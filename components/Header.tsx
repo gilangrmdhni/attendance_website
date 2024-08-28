@@ -229,14 +229,14 @@ const Header = () => {
                 onClose={() => setSnackbarVisible(false)}
             />
 
-            <header className="bg-primary-blue text-white p-8 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
+            <header className="bg-primary-blue text-white p-8 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-xl">
                 <div className="flex flex-col items-start">
                     <h1 className="text-xl font-semibold">Good Morning 🙌</h1>
                     <p className="text-lg font-semibold">
                         {token ? user?.full_name : 'Silahkan login'}
                     </p>
                 </div>
-                <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-[-70px] w-full max-w-80">
+                <div className="absolute justify-center right-4 top-full mt-[-70px] w-full max-w-[350px]">
                     <div className="bg-white text-black p-4 rounded-lg shadow-md text-center">
                         <p className="text-md text-gray-600 mb-2">
                             {new Date().toLocaleDateString('id-ID', {

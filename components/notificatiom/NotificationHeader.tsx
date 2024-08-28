@@ -1,3 +1,5 @@
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import router from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
 interface NotificationHeaderProps {
@@ -48,8 +50,14 @@ const NotificationHeader = ({
 
     return (
         <header className="bg-primary-blue text-white p-4 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
-            <div className="flex flex-col items-start mb-6">
-                <h1 className="text-2xl font-semibold">Notification</h1>
+            <div className="flex items-center relative z-10">
+                <button
+                    onClick={() => router.back()}
+                    className="text-white p-2 rounded-full bg-blue-700 hover:bg-blue-800"
+                >
+                    <ArrowLeftIcon className="w-6 h-6" />
+                </button>
+                <h1 className="ml-4 text-xl font-semibold">Notification</h1>
             </div>
             <div className="flex items-center mt-4">
                 <input
