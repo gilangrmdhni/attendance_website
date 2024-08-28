@@ -39,11 +39,11 @@ const ScanHeader = () => {
     const { time, period } = formatTime(dateTime);
 
     return (
-        <header className="bg-primary-blue text-white p-4 pb-20 relative rounded-b-lg">
+        <header className="bg-primary-blue text-white p-4 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
             <div className="flex flex-col items-start">
                 <h1 className="text-xl font-semibold">Attendance</h1>
             </div>
-            <div className="absolute justify-center top-full mt-[-70px] w-full max-w-[350px] ">
+            <div className="absolute justify-center top-full mt-[-70px] w-full max-w-[350px]">
                 <div className="bg-white p-6 rounded-xl shadow-md mb-4 text-center">
                     <p className="text-gray-500">{formatDate(dateTime)}</p>
                     <div className="flex justify-center items-center text-2xl font-semibold my-2 text-black">

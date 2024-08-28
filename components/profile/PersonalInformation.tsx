@@ -29,7 +29,7 @@ const PersonalInformation = () => {
 
     return (
         <div className="relative">
-            <header className="bg-blue-800 text-white p-6 h-60 rounded-b-3xl">
+            <header className="bg-primary-blue text-white p-6 h-60 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-3xl">
                 <div className="flex items-center">
                     <button
                         onClick={() => router.back()}

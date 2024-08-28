@@ -156,7 +156,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     };
 
     return (
-        <header className="bg-primary-blue text-white p-4 pb-20 relative rounded-b-lg">
+        <header className="bg-primary-blue text-white p-4 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
             <div className="flex items-start">
                 <button
                     onClick={() => router.back()}

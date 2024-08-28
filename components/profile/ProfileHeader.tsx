@@ -53,7 +53,7 @@ const ProfileHeader = () => {
   : '/images/profile-user.png';
 
   return (
-    <header className="bg-primary-blue text-white p-6 rounded-b-3xl text-center">
+    <header className="bg-primary-blue text-white p-6 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-3xl text-center">
       <div className='flex justify-between items-center p-1'>
         <span className='font-bold text-2xl'>Profil</span>
         <Image 

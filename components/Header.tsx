@@ -229,7 +229,7 @@ const Header = () => {
                 onClose={() => setSnackbarVisible(false)}
             />
 
-            <header className="bg-primary-blue text-white p-8 pb-20 relative rounded-b-lg">
+            <header className="bg-primary-blue text-white p-8 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
                 <div className="flex flex-col items-start">
                     <h1 className="text-xl font-semibold">Good Morning 🙌</h1>
                     <p className="text-lg font-semibold">

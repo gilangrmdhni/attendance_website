@@ -22,6 +22,7 @@ const initialState: AnnouncementState = {
     error: null,
 };
 
+
 // Async thunk untuk mengambil data dari API
 export const fetchAnnouncements = createAsyncThunk(
     'announcements/fetchAnnouncements',

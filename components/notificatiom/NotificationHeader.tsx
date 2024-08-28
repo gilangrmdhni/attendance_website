@@ -47,7 +47,7 @@ const NotificationHeader = ({
     };
 
     return (
-        <header className="bg-primary-blue text-white p-4 relative rounded-b-lg">
+        <header className="bg-primary-blue text-white p-4 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
             <div className="flex flex-col items-start mb-6">
                 <h1 className="text-2xl font-semibold">Notification</h1>
             </div>

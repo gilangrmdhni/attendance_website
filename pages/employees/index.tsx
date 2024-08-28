@@ -59,7 +59,7 @@ const EmployeesPage = () => {
 
     return (
         <MobileContainer>
-            <div className="bg-blue-800 text-white p-4 rounded-b-3xl">
+            <div className="bg-primary-blue text-white p-4 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-3xl">
                 <div className='relative flex items-center'>
                     <button onClick={() => router.back()} className='mr-4'>
                         <ArrowLeftIcon className="w-6 h-6" />

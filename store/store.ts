@@ -12,6 +12,7 @@ import reimbursementReducer from './slices/reimbursementSlice';
 import permissionReducer from './slices/permissionSlice';
 import timeOffReducer from './slices/timeOffSlice';
 import notificationReducer from './slices/notificationSlice';
+import announcementDetailReducer from './slices/announcementDetailSlice';
 import { useDispatch } from 'react-redux';
 
 const store = configureStore({
@@ -21,6 +22,7 @@ const store = configureStore({
     checkin: checkinReducer,
     checkout: checkoutReducer,
     announcements: announcementReducer,
+    announcementDetail: announcementDetailReducer,
     newsDetail: newsDetailReducer,
     history: historyReducer,
     requestApproval: requestApprovalReducer,

@@ -52,7 +52,7 @@ const HistoryHeader = ({
     };
 
     return (
-        <header className="bg-primary-blue text-white p-4 rounded-b-lg relative">
+        <header className="bg-primary-blue text-white p-4 rounded-b-lg relative bg-[url('/images/header.png')] bg-cover bg-center">
             <h1 className="text-xl font-semibold">History</h1>
             <div className="flex items-center mt-4 relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
