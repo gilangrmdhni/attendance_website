@@ -8,7 +8,7 @@ const PersonalInformationPage = () => {
   return (
     <MobileContainer>
       <Head>
-        <title>Personal Information</title>
+        <title>NUN | Personal Information</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <PersonalInformation />

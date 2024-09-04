@@ -107,7 +107,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                 response = await dispatch(submitReimbursementRequest(formattedData as any));
             } else if (title.includes('Cuti')) {  // Menambahkan kondisi untuk Time Off
                 response = await dispatch(submitTimeOffRequest(formattedData as any));
-            } else if (title.includes('Lembur')) {  
+            } else if (title.includes('Lembur')) {
                 response = await dispatch(submitOvertimeRequest(formattedData as any));
             }
             // Check if response is defined and contains an error
@@ -145,7 +145,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         }
     };
 
-    console.log('API Response:', Response);
+
 
     const closeErrorPopup = () => {
         setIsErrorPopupVisible(false);
@@ -183,10 +183,11 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                                         name={field.name}
                                         rows={4}
                                         className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                                        placeholder={field.label}
+                                        placeholder={"Tambahkan Keterangan"}
                                     />
                                 ) : field.type === 'file' ? (
-                                    <div className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-black">
+                                    <div className="w-full border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-black">
+                                        <img src="/icons/upload.png" alt="Camera Icon" className="w-10 h-8 mx-auto mb-2" />
                                         <input
                                             id={field.name}
                                             type="file"
@@ -196,7 +197,10 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                                             onChange={handleFileChange}
                                         />
                                         <label htmlFor={field.name} className="block text-sm font-medium text-blue-500 cursor-pointer">
-                                            Upload {field.label}
+                                            Upload Bukti foto untuk mengajukan
+                                        </label>
+                                        <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
+                                            Tambahkan bukti untuk mengkonfirmasi
                                         </label>
                                         {filePreview && (
                                             <div className="mt-4">
@@ -214,7 +218,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                                         type="number"
                                         name={field.name}
                                         className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                                        placeholder={field.label}
+                                        placeholder={"IDR 0"}
                                     />
                                 ) : (
                                     <div className="relative">
@@ -226,7 +230,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                                             placeholder={field.label}
                                         />
                                         {field.type === 'date' && (
-                                            <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-black">
+                                            <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
                                                 <svg
                                                     className="w-5 h-5 text-gray-400"
                                                     fill="none"
@@ -253,16 +257,22 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                 <div className='pt-4 pb-20'>
                     <button
                         onClick={() => formRef.current?.requestSubmit()}
-                        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-primary-blue text-white py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         Ajukan
                     </button>
                 </div>
             </div>
-            {/* Di bagian Popup ini ketuker logic nya popup untuk eror malah tampil saat berhasil dan sebalik nya heheh */}
             {isSuccessPopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
                     <div className="bg-white p-4 rounded-lg shadow-lg w-96">
+                        <div className="mb-4 w-full items-center">
+                            <img
+                                src="/icons/eror.png"
+                                alt="Success Icon"
+                                className="w-20 h-auto object-cover"
+                            />
+                        </div>
                         <h2 className="text-lg font-semibold text-gray-500">Error</h2>
                         <p className='text-gray-500'>{errorMessage}</p>
                         <button
@@ -277,8 +287,15 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
 
             {isErrorPopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-                    <div className="bg-white  p-4 rounded-lg shadow-lg w-96">
-                        <h2 className="text-lg font-semibold text-gray-500">Succes</h2>
+                    <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md text-center">
+                        <div className="mb-4 w-full">
+                            <img
+                                src="/images/ornamen.png"
+                                alt="Success Icon"
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
+                        <h2 className="text-lg font-semibold text-gray-500">Success</h2>
                         <p className='text-gray-500'>Data submitted successfully!</p>
                         <button
                             onClick={closeErrorPopup}
@@ -289,9 +306,6 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                     </div>
                 </div>
             )}
-
-
-
         </header>
     );
 };

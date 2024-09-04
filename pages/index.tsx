@@ -10,10 +10,6 @@ import MainContent from '@/components/MainContent';
 const Home = () => {
     return (
         <div className="relative">
-            <Head>
-                <title>Home</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            </Head>
             <MobileContainer>
                 <Header />
                 <main className="px-4 py-16">

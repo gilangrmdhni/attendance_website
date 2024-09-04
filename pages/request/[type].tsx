@@ -10,9 +10,9 @@ const formConfigurations: Record<string, FormConfig> = {
     timeoff: {
         title: 'Cuti Form',
         fields: [
-            { type: 'date', label: 'Pilih Tanggal', name: 'dates' },
+            { type: 'date', label: 'Tanggal', name: 'dates' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
-            { type: 'file', label: 'Attachment', name: 'attachment' }
+            { type: 'file', label: 'Tambahkan Foto', name: 'attachment' }
         ],
     },
     overtime: {
@@ -26,18 +26,18 @@ const formConfigurations: Record<string, FormConfig> = {
     reimbursement: {
         title: 'Reimbursement Form',
         fields: [
-            { type: 'text', label: 'Nominal', name: 'amount' },
-            { type: 'textarea', label: 'Deskripsi', name: 'description' },
-            { type: 'text', label: 'Account', name: 'account' },
-            { type: 'text', label: 'Trip', name: 'trip' },
-            { type: 'date', label: 'Dates', name: 'dates' },
-            { type: 'file', label: 'Attachment', name: 'attachment' }
+            { type: 'date', label: 'Tanggal', name: 'dates' },
+            { type: 'textarea', label: 'Keterangan', name: 'description' },
+            { type: 'text', label: 'Dinas Perjalanan', name: 'trip' },
+            { type: 'number', label: 'Nominal Pemakaian', name: 'amount' },
+            { type: 'text', label: 'Rekening Penerima', name: 'account' },
+            { type: 'file', label: 'Tambahkan Foto', name: 'attachment' }
         ],
     },
     permission: {
         title: 'Izin Form',
         fields: [
-            { type: 'text', label: 'Alasan', name: 'permission' },
+            { type: 'text', label: 'Judul', name: 'permission' },
             { type: 'date', label: 'Tanggal', name: 'dates' },
             { type: 'textarea', label: 'Deskripsi', name: 'description' },
             { type: 'file', label: 'Attachment', name: 'attachment' }

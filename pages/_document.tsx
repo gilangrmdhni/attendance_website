@@ -4,6 +4,8 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head />
+      <link rel="icon" href="/NUN.jpeg" />
+      <title>NUN | Attandance</title>
       <body>
         <Main />
         <NextScript />

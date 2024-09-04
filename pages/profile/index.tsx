@@ -27,7 +27,7 @@ const Profile = () => {
   return (
     <MobileContainer>
       <Head>
-        <title>Profile</title>
+        <title>NUN | Profile</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
 
