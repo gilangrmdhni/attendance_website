@@ -11,7 +11,7 @@ const initialState: HistoryState = {
 export const fetchHistory = createAsyncThunk(
   'history/fetchHistory',
   async () => {
-    const response = await axiosInstance.get('/attendance/history?page=1&limit=5&sort=DESC&order_By=checkin_time&search=wfo');
+    const response = await axiosInstance.get('/attendance/history');
     return response.data.body;
   }
 );
