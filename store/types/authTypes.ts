@@ -6,6 +6,7 @@ export interface Position {
 export interface User {
     id: number;
     email: string;
+    username: string;
     full_name: string;
     phone_number: string;
     status: string;
@@ -39,6 +40,6 @@ export interface LoginResponse {
 }
 
 export interface LoginPayload {
-    email: string;
+    username: string;
     password: string;
 }

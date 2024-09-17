@@ -7,7 +7,7 @@ import { login } from '../store/slices/authSlice';
 import MobileContainer from '@/components/MobileContainer';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
@@ -21,12 +21,12 @@ const Login = () => {
     }, [token, router]);
 
     const handleLogin = async () => {
-        if (!email || !password) {
-            setError("Email and password are required");
+        if (!username || !password) {
+            setError("Username and password are required");
             return;
         }
         try {
-            await dispatch(login({ email, password })).unwrap();
+            await dispatch(login({ username, password })).unwrap();
         } catch (err) {
             setError("Login failed. Please check your credentials.");
         }
@@ -56,20 +56,19 @@ const Login = () => {
                         </div>
                     </div>
 
-
                     {/* Form */}
                     <div className="p-6 py-10">
                         <p className="text-gray-700 text-sm mb-1">Good Morning 👋</p>
                         <h1 className="text-xl font-semibold mb-4">Welcome Back, Login to Continue your activity!</h1>
                         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-                        <label htmlFor="email" className="block text-gray-600 font-medium mb-1">Email</label>
+                        <label htmlFor="username" className="block text-gray-600 font-medium mb-1">Username</label>
                         <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Insert your Email here"
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Insert your Username here"
                             className="w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
 

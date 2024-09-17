@@ -54,6 +54,31 @@ export const updateUserPicture = createAsyncThunk(
   }
 );
 
+// Update User Profile
+export const updateUserProfile = createAsyncThunk(
+  'user/updateProfile',
+  async (profileData: { full_name: string; email: string; phone_number: string }, { getState, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const token = state.auth.token;
+
+    if (!token) {
+      return rejectWithValue('No token found');
+    }
+
+    try {
+      const response = await axiosInstance.put('/user/update-profile', profileData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data.body; 
+    } catch (error: any) {
+      return rejectWithValue('Failed to update profile');
+    }
+  }
+);
+
 interface UserState {
   user: User | null;
   loading: boolean;

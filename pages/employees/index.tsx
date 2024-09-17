@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 import { AppDispatch, RootState } from '../../store/store';
 import { useRouter } from 'next/router';
 import MobileContainer from '@/components/MobileContainer';
@@ -26,6 +25,7 @@ const EmployeesPage = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                console.log(response.data.body);
                 setDivisions(response.data.body || []);
             } catch (err) {
                 setError('Failed to fetch employees');
@@ -33,9 +33,9 @@ const EmployeesPage = () => {
                 setLoading(false);
             }
         };
-
+    
         fetchEmployees();
-    }, [token, router]);
+    }, [token, router]);    
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -45,6 +45,15 @@ const EmployeesPage = () => {
         if (attendance === 'present') return 'bg-green-500 shadow-green-300';
         return 'bg-red-500 shadow-red-300';
     };
+
+    const handleUserClick = (userId: number) => {
+        console.log('Navigating to UserInformation with ID:', userId);
+        if (userId) {
+            router.push(`/user-information/${userId}`);
+        } else {
+            console.error('Invalid user ID');
+        }
+    };     
 
     const filteredDivisions = divisions.map(division => ({
         ...division,
@@ -83,7 +92,11 @@ const EmployeesPage = () => {
                         <h2 className="text-xl font-semibold">{division.division_name}</h2>
                         <div className="space-y-2">
                             {division.users.map((user: any, userIndex: number) => (
-                                <div key={userIndex} className="flex items-center p-2 border-b border-gray-200 last:border-b-0">
+                                <div
+                                    key={userIndex}
+                                    className="flex items-center p-2 border-b border-gray-200 last:border-b-0 cursor-pointer"
+                                    onClick={() => handleUserClick(user.id)} 
+                                >
                                     <div className="flex-1">
                                         <p className="font-medium">{user.full_name}</p>
                                         <p className="text-sm text-gray-600">{user.position}</p>

@@ -1,35 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/store';
-import { fetchUser } from '../../store/slices/userSlice';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import { useRouter } from 'next/router';
+import axiosInstance from '@/utils/axiosInstance';
 
-const PersonalInformation = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { user, loading, error } = useSelector((state: RootState) => state.user);
+const UserInformation = () => {
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
-
-    // Local state for form fields
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-
-    // Local state for edit mode
-    const [isEditing, setIsEditing] = useState(false);
+    const { id } = router.query;
 
     useEffect(() => {
-        dispatch(fetchUser());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (user) {
-            setName(user.full_name || '');
-            setEmail(user.email || '');
-            setPhoneNumber(user.phone_number || '');
-        }
-    }, [user]);
+        console.log('Received ID:', id); 
+        const fetchUserData = async () => {
+            if (typeof id !== 'string') return;
+    
+            try {
+                const response = await axiosInstance.get(`/user/employee/${id}`);
+                setUser(response.data.body);
+            } catch (err) {
+                setError('Failed to fetch user data');
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchUserData();
+    }, [id]);    
 
     if (loading) {
         return <div>Loading...</div>;
@@ -53,7 +51,7 @@ const PersonalInformation = () => {
                     >
                         <ArrowLeftIcon className="w-6 h-6" />
                     </button>
-                    <h1 className="ml-4 text-xl font-semibold">Personal Information</h1>
+                    <h1 className="ml-4 text-xl font-semibold">User Information</h1>
                 </div>
             </header>
 
@@ -107,55 +105,9 @@ const PersonalInformation = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* New Editable Card */}
-                <div className="mt-6 bg-white p-6 rounded-lg shadow-md mb-20">
-                    <div className="mb-4">
-                        <label className="block text-gray-500 text-sm mb-2" htmlFor="name">Nama</label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-500 text-sm mb-2" htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-500 text-sm mb-2" htmlFor="phone_number">Nomor Telepon</label>
-                        <input
-                            type="text"
-                            id="phone_number"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                        />
-                    </div>
-                    <p className="text-xs text-gray-400 mb-4">
-                        * make sure to use your real information like on your identity card (KTP) for legal reasons
-                    </p>
-                    <button
-                        onClick={() => setIsEditing(!isEditing)}
-                        className="w-full py-2 bg-primary-blue text-white rounded-md hover:bg-blue-800 transition-all"
-                    >
-                        {isEditing ? 'Save' : 'Edit'}
-                    </button>
-                </div>
             </div>
-        </div >
+        </div>
     );
 };
 
-export default PersonalInformation;
+export default UserInformation;
