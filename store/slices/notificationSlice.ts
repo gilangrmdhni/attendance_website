@@ -5,6 +5,10 @@ interface Notification {
   id: number;
   title: string;
   description: string;
+  checkintime?: string;
+  status?: string;
+  dates?: string;
+  created_at: string;
 }
 
 interface NotificationState {

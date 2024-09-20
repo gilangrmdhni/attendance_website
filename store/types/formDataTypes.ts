@@ -8,6 +8,7 @@ interface FormData {
     trip: string;
     attachment: File | null;
     [key: string]: string | File | null; 
+    
 }
 
 const [formData, setFormData] = useState<FormData>({

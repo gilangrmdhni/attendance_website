@@ -9,7 +9,7 @@ export interface CheckInResponse {
         checkin_at: string;
     };
     code: number;
-    error: string | null;
+    error: string ;
     message: string;
 }
 

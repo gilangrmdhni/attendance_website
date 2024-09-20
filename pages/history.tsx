@@ -34,22 +34,22 @@ const History = () => {
     }
   }, [dispatch, historyStatus, requestsStatus]);
 
-  const filteredHistory = history.filter((item: HistoryItemType) => {
+  const filteredHistory = (history ?? []).filter((item: HistoryItemType) => {
     const matchesSearch = item.tipe.toLowerCase().includes(searchTerm.toLowerCase()) ||
       new Date(item.checkin_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).includes(searchTerm.toLowerCase());
     const matchesDateRange = (!filterStartDate || new Date(item.checkin_at) >= new Date(filterStartDate)) &&
       (!filterEndDate || new Date(item.checkin_at) <= new Date(filterEndDate));
     return matchesSearch && matchesDateRange;
   });
-
-  const filteredRequests = requests.filter((request: RequestApprovalType) => {
+  
+  const filteredRequests = (requests ?? []).filter((request: RequestApprovalType) => {
     const matchesSearch = request.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
       new Date(request.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).includes(searchTerm.toLowerCase());
     const matchesDateRange = (!filterStartDate || new Date(request.dates) >= new Date(filterStartDate)) &&
       (!filterEndDate || new Date(request.dates) <= new Date(filterEndDate));
     return matchesSearch && matchesDateRange;
   });
-
+  
   return (
     <MobileContainer>
       <Head>
@@ -106,9 +106,9 @@ const History = () => {
                   date={new Date(item.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   duration={item.status === 'approved' ? 'Full Day' : 'Pending'}
                 />
-              ))
+              )) 
             ) : (
-              <p>No time off requests found.</p>
+              <p>No time off requests found.</p>          
             )}
             {requestsStatus === 'failed' && <p>Error loading time off data. Please try again later.</p>}
           </>

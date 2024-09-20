@@ -6,6 +6,7 @@ import announcementReducer from './slices/announcementSlice';
 import newsDetailReducer from './slices/newsDetailSlice';
 import historyReducer from './slices/historySlice';
 import requestApprovalReducer from './slices/requestApprovalSlice';
+import approvalReducer from './slices/approvalRequestSlice';
 import checkoutReducer from './slices/checkoutSlice';
 import attendanceReducer from './slices/attendanceSlice';
 import reimbursementReducer from './slices/reimbursementSlice';
@@ -31,6 +32,8 @@ const store = configureStore({
     permission: permissionReducer,
     timeOff: timeOffReducer,
     notifications: notificationReducer,
+    approval: approvalReducer,
+    
   },
 });
 

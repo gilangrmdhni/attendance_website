@@ -31,7 +31,6 @@ const ProfileHeader = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       dispatch(updateUserPicture(event.target.files[0])).then(() => {
-        // Optional: Fetch user again to ensure updated picture is fetched
         dispatch(fetchUser());
       });
       setIsPopupVisible(false);
@@ -48,18 +47,21 @@ const ProfileHeader = () => {
     return null;
   }
 
-  const profilePictureUrl = user?.picture 
-   ? `https://api.attendance.nuncorp.id${user.picture}`
-  : '/images/profile-user.png';
+  const profilePictureUrl = user?.picture === '/storage/uploads/default.jpg'
+    ? '/icons/userEdit.png' 
+    : user?.picture
+      ? `https://api.attendance.nuncorp.id${user.picture}`
+      : '/icons/userEdit.png';
+
 
   return (
     <header className="bg-primary-blue text-white p-6 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-3xl text-center">
       <div className='flex justify-between items-center p-1'>
         <span className='font-bold text-2xl'>Profil</span>
-        <Image 
-          src="/icons/notification.png" 
-          alt="Notification Icon"   
-          width={24} 
+        <Image
+          src="/icons/notification.png"
+          alt="Notification Icon"
+          width={24}
           height={24}
           className="cursor-pointer"
         />
@@ -82,9 +84,9 @@ const ProfileHeader = () => {
           <p className="text-sm text-gray-400">
             {token ? user?.email : ''}
           </p>
-          {/* <p className="text-sm text-gray-400">
-            {token ? user?.position.name : ''}
-          </p> */}
+          <p className="text-sm text-gray-400">
+            {user?.position ? String(user.position) : 'N/A'}
+          </p>
         </div>
       </div>
       {isPopupVisible && token && <ProfilePopup onClose={togglePopup} onFileChange={handleFileChange} />}

@@ -5,6 +5,7 @@ import axiosInstance from '../utils/axiosInstance';
 import Snackbar from './Snackbar';
 import { ClockIcon } from '@heroicons/react/24/solid';
 import { fetchUser } from '../store/slices/userSlice';
+import { useRouter } from 'next/router';
 
 
 const Header = () => {
@@ -25,26 +26,29 @@ const Header = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [confirmCheckout, setConfirmCheckout] = useState(false);
+    const router = useRouter();
+    const [greeting, setGreeting] = useState('');
+
 
     const fetchTimer = async () => {
         try {
             const response = await axiosInstance.get('/attendance/timer');
             console.log("API Response:", response.data); // Debugging response
-            
+
             if (response.data && response.data.body) {
                 const { checkin, checkout } = response.data.body;
-    
-                console.log("Checkin At from API:", checkin?.checkin_at); // Debugging checkin_at
-    
+
+                console.log("Checkin At from API:", checkin?.checkin_at);
+
                 if (checkin?.checkin_at) {
                     setCheckinAt(checkin.checkin_at);
                     setCheckinType(checkin.checkin_type === 'work from office' ? 'WFO' : 'WFA/WFH');
-                    setButtonDisabled(checkout ? true : false); // Enable or disable button based on checkout
+                    setButtonDisabled(checkout ? true : false);
                 } else {
                     setCheckinAt(null);
-                    setButtonDisabled(true); // Disable button if checkinAt is null
+                    setButtonDisabled(true);
                 }
-    
+
                 if (checkout) {
                     setCheckoutAt(checkout);
                     setButtonDisabled(true);
@@ -65,42 +69,63 @@ const Header = () => {
             setButtonDisabled(true); // Ensure button is disabled on error
         }
     };
-    
+
+    const updateGreeting = () => {
+        const currentHour = new Date().getHours();
+        let newGreeting = 'Good Morning 🙌'; // Default greeting
+
+        if (currentHour >= 12 && currentHour < 17) {
+            newGreeting = 'Good Afternoon 🌞';
+        } else if (currentHour >= 17) {
+            newGreeting = 'Good Evening 🌙';
+        }
+
+        setGreeting(newGreeting);
+    };
+
+    useEffect(() => {
+        updateGreeting(); // Set initial greeting
+        const interval = setInterval(updateGreeting, 60000); // Update every minute
+
+        return () => clearInterval(interval); // Cleanup interval on unmount
+    }, []);
+
+
     useEffect(() => {
         fetchTimer();
     }, []);
 
     useEffect(() => {
         if (token) {
-          dispatch(fetchUser());
+            dispatch(fetchUser());
         }
-      }, [dispatch, token]);
-    
+    }, [dispatch, token]);
 
-      useEffect(() => {
+
+    useEffect(() => {
         let interval: NodeJS.Timeout | undefined;
-    
+
         if (checkinAt && !checkoutAt && !checkoutSuccessful) {
             const checkinDate = new Date(checkinAt);
-    
+
             if (isNaN(checkinDate.getTime())) {
                 console.error("Invalid Checkin Date:", checkinDate);
                 return;
             }
-    
+
             interval = setInterval(() => {
                 const now = new Date();
                 const diff = now.getTime() - checkinDate.getTime();
                 setElapsedTime(Math.floor(diff / 1000));
             }, 1000);
         }
-    
+
         return () => {
             if (interval) {
                 clearInterval(interval);
             }
         };
-    }, [checkinAt, checkoutAt, checkoutSuccessful]);    
+    }, [checkinAt, checkoutAt, checkoutSuccessful]);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -151,13 +176,12 @@ const Header = () => {
 
         const workHours = 8 * 3600;
         if (elapsedTime < workHours && !confirmCheckout) {
-            setShowConfirmDialog(true);  // Tampilkan dialog konfirmasi
+            setShowConfirmDialog(true);
             return;
         } else {
             setWarningMessage(null);
         }
 
-        // Proses checkout setelah konfirmasi
         const checkoutAt = new Date().toISOString();
         const message = "Saya Pamit";
 
@@ -177,7 +201,7 @@ const Header = () => {
             setCheckoutAt(checkoutAt);
 
             localStorage.setItem('checkoutSuccessful', 'true');
-            localStorage.removeItem('checkinAt'); // Remove checkinAt from localStorage
+            localStorage.removeItem('checkinAt');
         } catch (error) {
             console.error("Error during checkout:", error);
             setSnackbarMessage("Error during checkout. Please try again.");
@@ -220,6 +244,10 @@ const Header = () => {
         }
     };
 
+    const handleIconClick = () => {
+        router.push('/approval'); // Navigate to the ApprovalRequests page
+    };
+
     return (
         <>
             <Snackbar
@@ -230,12 +258,22 @@ const Header = () => {
             />
 
             <header className="bg-primary-blue text-white p-8 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-xl">
-                <div className="flex flex-col items-start">
-                    <h1 className="text-xl font-semibold">Good Morning 🙌</h1>
-                    <p className="text-lg font-semibold">
-                        {token ? user?.full_name : 'Silahkan login'}
-                    </p>
+                <div className="flex justify-between items-center">
+                    {/* Left Column */}
+                    <div className="flex flex-col items-start">
+                        {/* <h1 className="text-xl font-semibold">Good Morning 🙌</h1> */}
+                        <h1 className="text-xl font-semibold">{greeting}</h1>
+                        <p className="text-lg font-semibold">
+                            {token ? user?.full_name : 'Silahkan login'}
+                        </p>
+                    </div>
+
+                    {/* Right Column */}
+                    {user?.position && String(user.position) !== "Staff" && (
+                        <img src="/icons/manager.png" alt="User Icon" className="w-6 h-6" onClick={handleIconClick} />
+                    )}
                 </div>
+
                 <div className="absolute justify-center right-4 top-full mt-[-70px] w-full max-w-[350px]">
                     <div className="bg-white text-black p-4 rounded-lg shadow-md text-center">
                         <p className="text-md text-gray-600 mb-2">

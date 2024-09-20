@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
-import { fetchUser } from '../../store/slices/userSlice';
+import { fetchUser, updateUserProfile } from '../../store/slices/userSlice';
 import Image from 'next/image';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/router';
+import Modal from '../../utils/Modal'; // Import the Modal component
 
 const PersonalInformation = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -18,6 +19,10 @@ const PersonalInformation = () => {
 
     // Local state for edit mode
     const [isEditing, setIsEditing] = useState(false);
+
+    // Local state for error message
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
 
     useEffect(() => {
         dispatch(fetchUser());
@@ -39,9 +44,39 @@ const PersonalInformation = () => {
         return <div className="text-red-500">Error: {error}</div>;
     }
 
-    const profilePictureUrl = user?.picture
-        ? `https://api.attendance.nuncorp.id${user.picture}`
-        : '/images/profile-user.png';
+    const profilePictureUrl = user?.picture === '/storage/uploads/default.jpg'
+        ? '/icons/userEdit.png'
+        : user?.picture
+            ? `https://api.attendance.nuncorp.id${user.picture}`
+            : '/icons/userEdit.png';
+
+    const handleSave = async () => {
+        const profileData = {
+            full_name: name,
+            email: email,
+            phone_number: phoneNumber,
+        };
+
+        try {
+            await dispatch(updateUserProfile(profileData)).unwrap();
+            setIsEditing(false); // Kembali ke mode tampilan setelah berhasil menyimpan
+            setErrorMessage(null); // Reset error message on success
+            setIsModalOpen(false); // Close modal if it was open
+        } catch (error: any) {
+            // Set error message based on the response from the API
+            if (error.code === 400 && error.error) {
+                setErrorMessage(Object.values(error.error).join(', ')); // Join multiple error messages
+            } else {
+                setErrorMessage('Failed to save profile. Please try again.'); // Fallback error message
+            }
+            setIsModalOpen(true); // Open modal on error
+        }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setErrorMessage(null); // Clear error message on close
+    };
 
     return (
         <div className="relative">
@@ -147,13 +182,18 @@ const PersonalInformation = () => {
                         * make sure to use your real information like on your identity card (KTP) for legal reasons
                     </p>
                     <button
-                        onClick={() => setIsEditing(!isEditing)}
+                        onClick={isEditing ? handleSave : () => setIsEditing(true)}
                         className="w-full py-2 bg-primary-blue text-white rounded-md hover:bg-blue-800 transition-all"
                     >
                         {isEditing ? 'Save' : 'Edit'}
                     </button>
                 </div>
             </div>
+
+            {/* Modal for error messages */}
+            {isModalOpen && errorMessage && (
+                <Modal message={errorMessage} onClose={closeModal} />
+            )}
         </div >
     );
 };

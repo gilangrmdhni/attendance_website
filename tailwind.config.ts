@@ -14,6 +14,7 @@ const config: Config = {
       },
       colors: {
         'primary-blue': '#0363AF',
+        'error-red': '#E90000',
       },
     },
   },
