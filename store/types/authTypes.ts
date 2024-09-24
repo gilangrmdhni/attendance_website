@@ -40,6 +40,8 @@ export interface LoginResponse {
 }
 
 export interface LoginPayload {
+    email: string;
     username: string;
     password: string;
 }
+

@@ -2,6 +2,7 @@
 interface User {
     id: number;
     username: string;
+    email: string;
     name: string;
     workHourTime: string;
     position: string;

@@ -7,6 +7,7 @@ import { login } from '../store/slices/authSlice';
 import MobileContainer from '@/components/MobileContainer';
 
 const Login = () => {
+    const [email, setEmail] = useState(''); // Tambahkan state untuk email
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -21,12 +22,12 @@ const Login = () => {
     }, [token, router]);
 
     const handleLogin = async () => {
-        if (!username || !password) {
-            setError("Username and password are required");
+        if (!email || !username || !password) {
+            setError("Email, Username, and Password are required");
             return;
         }
         try {
-            await dispatch(login({ username, password })).unwrap();
+            await dispatch(login({ email, username, password })).unwrap();
         } catch (err) {
             setError("Login failed. Please check your credentials.");
         }
@@ -61,6 +62,16 @@ const Login = () => {
                         <p className="text-gray-700 text-sm mb-1">Good Morning 👋</p>
                         <h1 className="text-xl font-semibold mb-4">Welcome Back, Login to Continue your activity!</h1>
                         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+                        <label htmlFor="email" className="block text-gray-600 font-medium mb-1">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Insert your Email here"
+                            className="w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
 
                         <label htmlFor="username" className="block text-gray-600 font-medium mb-1">Username</label>
                         <input
