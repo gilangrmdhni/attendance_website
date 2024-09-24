@@ -6,13 +6,15 @@ import { AppDispatch, RootState } from '../../store/store';
 import ProfilePopup from './ProfilePopup';
 import { fetchUser, updateUserPicture } from '../../store/slices/userSlice';
 
+
 const ProfileHeader = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);  // To check client-side mounting
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { user, loading, error } = useSelector((state: RootState) => state.user);
+  const { user, error } = useSelector((state: RootState) => state.user); // Removed `loading`
   const { token } = useSelector((state: RootState) => state.auth);
+  const [profilePictureUrl, setProfilePictureUrl] = useState('/icons/userEdit.png');
 
   useEffect(() => {
     if (token) {
@@ -21,8 +23,16 @@ const ProfileHeader = () => {
   }, [dispatch, token]);
 
   useEffect(() => {
+    // Ensure client-side rendering only after mount
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (user?.picture) {
+      setProfilePictureUrl(`https://api.attendance.nuncorp.id${user.picture}?timestamp=${Date.now()}`);
+    }
+  }, [user]);
+  
 
   const togglePopup = () => {
     setIsPopupVisible(!isPopupVisible);
@@ -30,29 +40,33 @@ const ProfileHeader = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      dispatch(updateUserPicture(event.target.files[0])).then(() => {
-        dispatch(fetchUser());
+      const newPictureUrl = URL.createObjectURL(event.target.files[0]);
+      setProfilePictureUrl(newPictureUrl); // Set URL lokal
+
+      // Update gambar di API
+      dispatch(updateUserPicture(event.target.files[0])).then((action) => {
+        if (updateUserPicture.fulfilled.match(action)) {
+          // Jika berhasil, kita bisa refetch user untuk mendapatkan data terbaru
+          dispatch(fetchUser());
+        } else {
+          // Jika gagal, kita dapat mengembalikan URL yang sudah ada jika perlu
+          console.error(action.payload);
+        }
       });
       setIsPopupVisible(false);
     }
   };
-
+  
   const handleLoginRedirect = () => {
     if (!token) {
       router.push('/login');
     }
   };
 
+  // Wait until the component is mounted to render client-side content
   if (!isMounted) {
-    return null;
+    return null; // Avoid rendering on the server
   }
-
-  const profilePictureUrl = user?.picture === '/storage/uploads/default.jpg'
-    ? '/icons/userEdit.png' 
-    : user?.picture
-      ? `https://api.attendance.nuncorp.id${user.picture}`
-      : '/icons/userEdit.png';
-
 
   return (
     <header className="bg-primary-blue text-white p-6 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-3xl text-center">
@@ -79,10 +93,10 @@ const ProfileHeader = () => {
         </div>
         <div className="text-left cursor-pointer" onClick={handleLoginRedirect}>
           <h1 className="text-lg font-semibold text-gray-800">
-            {token ? user?.full_name : 'Silahkan login'}
+            {token && user ? user?.full_name : 'Silahkan login'}
           </h1>
           <p className="text-sm text-gray-400">
-            {token ? user?.email : ''}
+            {token && user ? user?.email : ''}
           </p>
           <p className="text-sm text-gray-400">
             {user?.position ? String(user.position) : 'N/A'}
@@ -90,7 +104,7 @@ const ProfileHeader = () => {
         </div>
       </div>
       {isPopupVisible && token && <ProfilePopup onClose={togglePopup} onFileChange={handleFileChange} />}
-      {error && token && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
     </header>
   );
 };

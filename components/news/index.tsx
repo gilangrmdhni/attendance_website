@@ -52,7 +52,7 @@ const News: React.FC = () => {
               className="w-16 h-16 rounded-md mr-4"
             />
             <div className="flex-1">
-              <p className="text-sm text-gray-500">{formatDate(announcement.dates)}</p>
+              <p className="text-sm text-gray-500">{formatDate(announcement.created_at)}</p>
               <p className="text-sm font-semibold">{announcement.title}</p>
               <p className="text-sm text-gray-600">{truncateText(announcement.description, 20)}</p> {/* Batasi deskripsi */}
             </div>

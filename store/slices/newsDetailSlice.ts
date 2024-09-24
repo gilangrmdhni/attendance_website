@@ -5,7 +5,7 @@ export interface NewsDetail {
   id: number;
   title: string;
   description: string;
-  dates: string;
+  created_at: string;
   picture: string;
 }
 

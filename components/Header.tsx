@@ -244,6 +244,17 @@ const Header = () => {
         }
     };
 
+    const allowedPositions = [
+        "Vice President Delivery And Operation",
+        "Vice President of Business Research & Development",
+        "Vice President of HRGA",
+        "Vice President of Finance & Tax",
+        "General Manager",
+        "Manager",
+        "Finance Supervisor",
+        "Officer"
+    ];
+
     const handleIconClick = () => {
         router.push('/approval'); // Navigate to the ApprovalRequests page
     };
@@ -261,7 +272,6 @@ const Header = () => {
                 <div className="flex justify-between items-center">
                     {/* Left Column */}
                     <div className="flex flex-col items-start">
-                        {/* <h1 className="text-xl font-semibold">Good Morning 🙌</h1> */}
                         <h1 className="text-xl font-semibold">{greeting}</h1>
                         <p className="text-lg font-semibold">
                             {token ? user?.full_name : 'Silahkan login'}
@@ -269,7 +279,7 @@ const Header = () => {
                     </div>
 
                     {/* Right Column */}
-                    {user?.position && String(user.position) !== "Staff" && (
+                    {user?.position && allowedPositions.includes(String(user.position)) && (
                         <img src="/icons/manager.png" alt="User Icon" className="w-6 h-6" onClick={handleIconClick} />
                     )}
                 </div>
@@ -341,7 +351,7 @@ const Header = () => {
                                 onClick={() => {
                                     setConfirmCheckout(true);
                                     setShowConfirmDialog(false);
-                                    handleCheckout();  // Lanjutkan checkout setelah konfirmasi
+                                    handleCheckout();
                                 }}
                             >
                                 Checkout

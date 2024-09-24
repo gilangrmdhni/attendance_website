@@ -71,7 +71,7 @@ const NewsDetail: React.FC = () => {
           />
         </div>
         <h1 className="text-2xl font-semibold mb-2">{announcement.title}</h1>
-        <p className="text-sm text-gray-500 mb-4">{formatDate(announcement.dates)}</p>
+        <p className="text-sm text-gray-500 mb-4">{formatDate(announcement.created_at)}</p>
         <p className="text-base text-gray-700">{announcement.description}</p>
       </div>
     </MobileContainer>

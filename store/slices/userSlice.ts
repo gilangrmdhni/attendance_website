@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { User } from '../types/authTypes';
-import axiosInstance from '../../utils/axiosInstance'; 
+import axiosInstance from '../../utils/axiosInstance';
+
 
 export const fetchUser = createAsyncThunk(
   'user/fetchUser',
@@ -46,11 +47,15 @@ export const updateUserPicture = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      // Assume the API response contains the updated picture URL
-      return response.data.body.picture; 
+
+      console.log('API Response:', response.data);
+      
+      // Kembalikan URL gambar baru, jika tidak ada di body, maka kembalikan null
+      return response.data.body?.picture || null; 
     } catch (error: any) {
+      console.error('Error while updating picture:', error);
       return rejectWithValue('Failed to update picture');
-    }
+    }    
   }
 );
 
@@ -72,7 +77,7 @@ export const updateUserProfile = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       });
-      return response.data.body; 
+      return response.data.body;
     } catch (error: any) {
       return rejectWithValue('Failed to update profile');
     }
@@ -116,13 +121,22 @@ const userSlice = createSlice({
       .addCase(updateUserPicture.fulfilled, (state, action) => {
         state.loading = false;
         if (state.user) {
-          state.user = {
-            ...state.user,
-            picture: action.payload, 
-          };
+          state.user.picture = action.payload;  
         }
-      })
+      })      
       .addCase(updateUserPicture.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

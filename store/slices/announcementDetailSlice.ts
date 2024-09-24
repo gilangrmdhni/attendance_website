@@ -6,7 +6,7 @@ export interface AnnouncementDetailState {
     id: number;
     title: string;
     description: string;
-    dates: string;
+    created_at: string;
     picture: string;
   } | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';

@@ -2,6 +2,7 @@ export interface CheckInPayload {
     checkin_latitude: string | number;
     checkin_longitude: string | number;
     picture: File; 
+    message: string;
 }
 
 export interface CheckInResponse {

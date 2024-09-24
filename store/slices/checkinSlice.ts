@@ -6,6 +6,7 @@ const initialState: CheckinState = {
     status: 'idle',
     error: null,
     data: null,
+
 };
 
 export const checkInWFO = createAsyncThunk<

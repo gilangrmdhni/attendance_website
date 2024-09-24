@@ -4,21 +4,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FiArrowRight } from 'react-icons/fi';
 import { checkInWFO, checkInWFAWFH } from '../../store/slices/checkinSlice';
 import { AppDispatch, RootState } from '../../store/store';
+import SuccessModal from '../../components/SuccessModal'; // Import the SuccessModal component
+import ErrorModal from '../../components/ErrorModal'; // Import the ErrorModal component
+import { useRouter } from 'next/router';
+
 
 const Map = dynamic(() => import('../../utils/Map'), { ssr: false });
 
 const ScanContent = () => {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [isErrorPopupVisible, setIsErrorPopupVisible] = useState(false);
-    const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState(false);
     const [selectedOption, setSelectedOption] = useState<'WFO' | 'WFA/WFH' | null>(null);
     const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [filePreview, setFilePreview] = useState<string | null>(null); 
+    const [filePreview, setFilePreview] = useState<string | null>(null);
     const dispatch = useDispatch<AppDispatch>();
-    const { status, error, data } = useSelector((state: RootState) => state.checkin);
+    const { status, error } = useSelector((state: RootState) => state.checkin);
     const [isCheckedIn, setIsCheckedIn] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null); // State untuk pesan error
+    const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false); // State for success modal
+    const [isErrorModalVisible, setIsErrorModalVisible] = useState(false); // State for error modal
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter(); // Inisialisasi router
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -37,10 +42,10 @@ const ScanContent = () => {
     useEffect(() => {
         if (status === 'succeeded') {
             setIsCheckedIn(true);
-            setIsSuccessPopupVisible(true);
+            setIsSuccessModalVisible(true); // Show success modal
         } else if (status === 'failed') {
-            setErrorMessage(error || 'Something went wrong. Please try again.'); // Ambil pesan error dari API
-            setIsErrorPopupVisible(true);
+            setErrorMessage(error || 'Something went wrong. Please try again.');
+            setIsErrorModalVisible(true); // Show error modal
         }
     }, [status, error]);
 
@@ -84,8 +89,16 @@ const ScanContent = () => {
                 await dispatch(checkInWFAWFH(formData)).unwrap();
             }
             setIsCheckedIn(true);
-        } catch (error) {
+        } catch (error: any) { // Ubah di sini untuk menetapkan tipe 'any'
             console.error("Check-in error:", error);
+
+            // Ambil pesan kesalahan dari API
+            if (error && error.data && error.data.error) {
+                setErrorMessage(error.data.error); // Set pesan kesalahan dari API
+            } else {
+                setErrorMessage('Failed to check in.'); // Pesan default jika tidak ada pesan dari API
+            }
+            setIsErrorModalVisible(true);
         }
     };
 
@@ -93,18 +106,27 @@ const ScanContent = () => {
         setIsPopupVisible(false);
     };
 
-    const closeErrorPopup = () => {
-        setIsErrorPopupVisible(false);
+    const closeSuccessModal = () => {
+        setIsSuccessModalVisible(false);
+        setIsCheckedIn(false); // Reset checked-in status
+        window.location.reload();
+        router.push('/'); // Arahkan ke halaman home
+    };    
+
+    const closeErrorModal = () => {
+        setIsErrorModalVisible(false);
+        setErrorMessage(null); // Reset error message
+        window.location.reload(); // Refresh the page
     };
 
     return (
         <section className="relative p-4 max-w-sm mx-auto">
             {/* Main Container */}
             <div onClick={togglePopup} className="bg-white p-6 rounded-xl shadow-md mb-4 flex items-center cursor-pointer max-w-full">
-                <img 
-                    src={selectedOption === 'WFO' ? "/images/wfo.png" : selectedOption === 'WFA/WFH' ? "/images/wfh.png" : "/images/globe.png"} 
-                    alt="Icon" 
-                    className="w-10 h-10 mr-4 bg-blue-100 p-2 rounded-full" 
+                <img
+                    src={selectedOption === 'WFO' ? "/images/wfo.png" : selectedOption === 'WFA/WFH' ? "/images/wfh.png" : "/images/globe.png"}
+                    alt="Icon"
+                    className="w-10 h-10 mr-4 bg-blue-100 p-2 rounded-full"
                 />
                 <div className="flex-1">
                     <div className="flex justify-between items-center mb-2">
@@ -135,7 +157,7 @@ const ScanContent = () => {
 
             {/* File Upload Section */}
             <div className="bg-white p-4 rounded-xl shadow-md mb-4 text-center">
-                <div 
+                <div
                     className="border-2 border-dashed border-blue-500 rounded-lg p-4 mb-4 bg-blue-100 cursor-pointer"
                     onClick={() => document.getElementById('fileInput')?.click()}
                 >
@@ -165,7 +187,6 @@ const ScanContent = () => {
                 >
                     {status === 'loading' ? 'Checking In...' : isCheckedIn ? 'Checked In' : 'Check In'}
                 </button>
-                {status === 'failed' && <p className="text-red-500 mt-2 text-xs md:text-sm">{errorMessage}</p>}
             </div>
 
             {/* Popup for Selecting Option */}
@@ -190,33 +211,24 @@ const ScanContent = () => {
                                 </div>
                                 <FiArrowRight className="ml-auto text-gray-500" />
                             </div>
-                            <button onClick={closePopup} className="mt-4 text-blue-500">Close</button>
+                            <button onClick={closePopup} className="mt-4 w-full align-text-top p-2 rounded-lg bg-primary-blue text-white">Close</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Error Popup */}
-            {isErrorPopupVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999]">
-                    <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <h2 className="text-red-500 font-semibold text-lg mb-2">Error</h2>
-                        <p>{errorMessage}</p>
-                        <button onClick={closeErrorPopup} className="mt-4 bg-red-500 text-white py-2 px-4 rounded-lg">Close</button>
-                    </div>
-                </div>
-            )}
+            {/* Success Modal */}
+            <SuccessModal
+                isVisible={isSuccessModalVisible}
+                onClose={closeSuccessModal}
+            />
 
-            {/* Success Popup */}
-            {isSuccessPopupVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999]">
-                    <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <h2 className="text-green-500 font-semibold text-lg mb-2">Success</h2>
-                        <p>Check-in berhasil!</p>
-                        <button onClick={() => setIsSuccessPopupVisible(false)} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">Close</button>
-                    </div>
-                </div>
-            )}
+            {/* Error Modal */}
+            <ErrorModal
+                isVisible={isErrorModalVisible}
+                onClose={closeErrorModal}
+                errorMessage={errorMessage}
+            />
         </section>
     );
 };

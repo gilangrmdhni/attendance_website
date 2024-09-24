@@ -57,11 +57,16 @@ const EmployeesPage = () => {
 
     const filteredDivisions = divisions.map(division => ({
         ...division,
-        users: division.users.filter((user: any) =>
-            user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.position.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    }));
+        users: division.users.filter((user: any) => {
+            const fullName = user.full_name || ''; 
+            const position = user.position || ''; 
+    
+            return (
+                fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                position.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        })
+    }));    
 
     if (loading) return <p className="text-center p-4">Loading...</p>;
     if (error) return <p className="text-center text-red-500 p-4">{error}</p>;

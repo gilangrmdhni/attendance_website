@@ -1,120 +1,224 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../store/store';
-import { fetchTimer, setElapsedTime, fetchCheckinStatus } from '../store/slices/attendanceSlice';
-import { checkoutWFO, checkoutWFAWFH } from '../store/slices/checkoutSlice';
-import { ClockIcon } from '@heroicons/react/24/outline';
-import { fetchUser } from '../store/slices/userSlice';
+// import { useState, useEffect } from 'react';
+// import dynamic from 'next/dynamic';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { FiArrowRight } from 'react-icons/fi';
+// import { checkInWFO, checkInWFAWFH } from '../../store/slices/checkinSlice';
+// import { AppDispatch, RootState } from '../../store/store';
+// import SuccessModal from '../../components/SuccessModal'; // Import the SuccessModal component
+// import ErrorModal from '../../components/ErrorModal'; // Import the ErrorModal component
 
-const Header = () => {
-    const dispatch: AppDispatch = useDispatch();
-    const checkinAt = useSelector((state: RootState) => state.attendance.checkinAt);
-    const elapsedTime = useSelector((state: RootState) => state.attendance.elapsedTime);
-    const isWFO = useSelector((state: RootState) => state.attendance.isWFO);
-    const checkoutStatus = useSelector((state: RootState) => state.checkout.status);
-    const user = useSelector((state: RootState) => state.user.user); 
-    const token = useSelector((state: RootState) => state.auth.token); 
+// const Map = dynamic(() => import('../../utils/Map'), { ssr: false });
 
-    useEffect(() => {
-        if (token) {
-            dispatch(fetchUser());
-        }
-    }, [dispatch, token]);
+// const ScanContent = () => {
+//     const [isPopupVisible, setIsPopupVisible] = useState(false);
+//     const [selectedOption, setSelectedOption] = useState<'WFO' | 'WFA/WFH' | null>(null);
+//     const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+//     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+//     const [filePreview, setFilePreview] = useState<string | null>(null);
+//     const dispatch = useDispatch<AppDispatch>();
+//     const { status, error } = useSelector((state: RootState) => state.checkin);
+//     const [isCheckedIn, setIsCheckedIn] = useState(false);
+//     const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false); // State for success modal
+//     const [isErrorModalVisible, setIsErrorModalVisible] = useState(false); // State for error modal
+//     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        dispatch(fetchTimer());
-        dispatch(fetchCheckinStatus());
-    }, [dispatch]);
+//     useEffect(() => {
+//         if (navigator.geolocation) {
+//             navigator.geolocation.getCurrentPosition(
+//                 position => {
+//                     const { latitude, longitude } = position.coords;
+//                     setSelectedLocation({ latitude, longitude });
+//                 },
+//                 error => console.error("Geolocation error:", error)
+//             );
+//         } else {
+//             console.error("Geolocation is not supported by this browser.");
+//         }
+//     }, []);
 
-    useEffect(() => {
-        if (checkinAt) {
-            const checkinDate = new Date(checkinAt);
+//     useEffect(() => {
+//         if (status === 'succeeded') {
+//             setIsCheckedIn(true);
+//             setIsSuccessModalVisible(true); // Show success modal
+//         } else if (status === 'failed') {
+//             setErrorMessage(error || 'Something went wrong. Please try again.');
+//             setIsErrorModalVisible(true); // Show error modal
+//         }
+//     }, [status, error]);
 
-            const interval = setInterval(() => {
-                const now = new Date();
-                const diff = now.getTime() - checkinDate.getTime();
-                dispatch(setElapsedTime(Math.floor(diff / 1000)));
-            }, 1000);
+//     const handleLocationSelect = (latitude: number, longitude: number) => {
+//         setSelectedLocation({ latitude, longitude });
+//     };
 
-            return () => clearInterval(interval);
-        }
-    }, [checkinAt, dispatch]);
+//     const togglePopup = () => {
+//         setIsPopupVisible(prev => !prev);
+//     };
 
-    const handleCheckout = () => {
-        if (checkinAt) {
-            const payload = {
-                checkout_at: new Date().toISOString(),
-                message: "Saya Pamit",
-                elapsed_time: elapsedTime
-            };
-            if (isWFO) {
-                dispatch(checkoutWFO(payload));
-            } else {
-                dispatch(checkoutWFAWFH(payload));
-            }
-        }
-    };
+//     const handleOptionSelect = (option: 'WFO' | 'WFA/WFH') => {
+//         setSelectedOption(option);
+//         togglePopup();
+//     };
 
-    const formatTime = (seconds: number) => {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    };
+//     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//         const file = event.target.files?.[0];
+//         if (file) {
+//             setSelectedFile(file);
+//             const reader = new FileReader();
+//             reader.onloadend = () => setFilePreview(reader.result as string);
+//             reader.readAsDataURL(file);
+//         }
+//     };
 
-    return (
-        <header className="bg-primary-blue text-white p-8 pb-20 relative rounded-b-lg">
-            <div className="flex flex-col items-start">
-                <h1 className="text-xl font-semibold">Good Morning 🙌</h1>
-                <p className="text-lg font-medium">{token ? user?.full_name : 'Silahkan login'}</p>
-            </div>
-            <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-[-70px] w-full max-w-80">
-                <div className="bg-white text-black p-4 rounded-lg shadow-md text-center">
-                    <p className="text-md text-gray-600 mb-2">
-                        {new Date().toLocaleDateString('id-ID', {
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })}
-                    </p>
-                    <div className="flex justify-center items-center space-x-1 mb-2">
-                        {checkinAt ? (
-                            <div className="flex space-x-1">
-                                {formatTime(elapsedTime).split(':').map((part, index) => (
-                                    <React.Fragment key={index}>
-                                        <span className="bg-gray-100 px-2 py-1 rounded-md">{part}</span>
-                                        {index < 2 && <span className="px-2 py-1 rounded-md">:</span>}
-                                    </React.Fragment>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="flex space-x-1">
-                                <span className="bg-gray-100 px-2 py-1 rounded-md">00</span>
-                                <span>:</span>
-                                <span className="bg-gray-100 px-2 py-1 rounded-md">00</span>
-                                <span>:</span>
-                                <span className="bg-gray-100 px-2 py-1 rounded-md">00</span>
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex justify-center items-center space-x-1 text-gray-400 text-sm">
-                        <div className="flex justify-center items-center space-x-1 text-gray-400 text-sm">
-                            <ClockIcon className="w-4 h-4" />
-                        </div>
-                        <span className='text-gray-400'>Work hour time</span>
-                    </div>
-                    <button
-                        onClick={handleCheckout}
-                        disabled={!checkinAt || checkoutStatus === 'loading'}
-                        className={`mt-4 px-4 py-2 rounded-lg ${checkinAt ? (checkoutStatus === 'loading' ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-blue-600 text-white') : 'bg-gray-400 text-gray-600 cursor-not-allowed'}`}
-                    >
-                        {checkinAt ? (checkoutStatus === 'loading' ? 'Processing...' : 'Checkout') : 'Check-in dulu'}
-                    </button>
-                </div>
-            </div>
-        </header>
-    );
-};
+//     const handleCheckIn = async () => {
+//         if (!selectedOption || !selectedLocation || !selectedFile) {
+//             console.error("Missing required fields: Option, location, or file");
+//             return;
+//         }
+//         const formData = new FormData();
+//         formData.append('checkin_latitude', selectedLocation.latitude.toString());
+//         formData.append('checkin_longitude', selectedLocation.longitude.toString());
+//         formData.append('picture', selectedFile);
 
-export default Header;
+//         try {
+//             if (selectedOption === 'WFO') {
+//                 await dispatch(checkInWFO(formData)).unwrap();
+//             } else if (selectedOption === 'WFA/WFH') {
+//                 await dispatch(checkInWFAWFH(formData)).unwrap();
+//             }
+//             setIsCheckedIn(true);
+//         } catch (error) {
+//             console.error("Check-in error:", error);
+//             setErrorMessage(errorMessage || 'Failed to check in.');
+//             setIsErrorModalVisible(true);
+//         }
+//     };
+
+//     const closePopup = () => {
+//         setIsPopupVisible(false);
+//     };
+
+//     const closeSuccessModal = () => {
+//         setIsSuccessModalVisible(false);
+//         setIsCheckedIn(false); // Reset checked-in status
+//     };
+
+//     const closeErrorModal = () => {
+//         setIsErrorModalVisible(false);
+//         setErrorMessage(null); // Reset error message
+//     };
+
+//     return (
+//         <section className="relative p-4 max-w-sm mx-auto">
+//             {/* Main Container */}
+//             <div onClick={togglePopup} className="bg-white p-6 rounded-xl shadow-md mb-4 flex items-center cursor-pointer max-w-full">
+//                 <img
+//                     src={selectedOption === 'WFO' ? "/images/wfo.png" : selectedOption === 'WFA/WFH' ? "/images/wfh.png" : "/images/globe.png"}
+//                     alt="Icon"
+//                     className="w-10 h-10 mr-4 bg-blue-100 p-2 rounded-full"
+//                 />
+//                 <div className="flex-1">
+//                     <div className="flex justify-between items-center mb-2">
+//                         <div>
+//                             <p className="font-semibold">{selectedOption ? `Check-In ${selectedOption}` : 'Pilih kondisi Absensi mu'}</p>
+//                             <p className="text-gray-400 text-sm">{selectedOption ? `Check in for working ${selectedOption === 'WFO' ? 'Inside' : 'Outside'} the office` : 'Kamu bisa memilih untuk kerja Work from Office atau Work from Away'}</p>
+//                         </div>
+//                         <button className="text-gray-500">
+//                             <FiArrowRight className="w-5 h-5" />
+//                         </button>
+//                     </div>
+//                 </div>
+//             </div>
+
+//             {/* Map Section */}
+//             <div className="bg-white p-4 rounded-xl shadow-md mb-4 z-auto">
+//                 <div className="bg-gray-100 rounded-lg p-2 md:p-4 mb-4">
+//                     {selectedLocation ? (
+//                         <Map
+//                             position={[selectedLocation.latitude, selectedLocation.longitude]}
+//                             onLocationSelect={handleLocationSelect}
+//                         />
+//                     ) : (
+//                         <p className="text-gray-500 text-xs md:text-sm">Menunggu lokasi...</p>
+//                     )}
+//                 </div>
+//             </div>
+
+//             {/* File Upload Section */}
+//             <div className="bg-white p-4 rounded-xl shadow-md mb-4 text-center">
+//                 <div
+//                     className="border-2 border-dashed border-blue-500 rounded-lg p-4 mb-4 bg-blue-100 cursor-pointer"
+//                     onClick={() => document.getElementById('fileInput')?.click()}
+//                 >
+//                     <img src="/images/camera.png" alt="Camera Icon" className="w-8 h-8 mx-auto mb-2" />
+//                     <input
+//                         type="file"
+//                         accept="image/*"
+//                         onChange={handleFileChange}
+//                         className="hidden"
+//                         id="fileInput"
+//                     />
+//                     <label className="text-primary-blue text-sm">Ambil atau Upload foto selfie</label>
+//                     {filePreview && (
+//                         <div className="mt-4">
+//                             <img
+//                                 src={filePreview}
+//                                 alt="Preview"
+//                                 className="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+//                             />
+//                         </div>
+//                     )}
+//                 </div>
+//                 <button
+//                     onClick={handleCheckIn}
+//                     className={`w-full py-2 rounded-lg text-sm md:text-base ${isCheckedIn ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
+//                     disabled={isCheckedIn || status === 'loading'}
+//                 >
+//                     {status === 'loading' ? 'Checking In...' : isCheckedIn ? 'Checked In' : 'Check In'}
+//                 </button>
+//             </div>
+
+//             {/* Popup for Selecting Option */}
+//             {isPopupVisible && (
+//                 <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-[9999]">
+//                     <div className="bg-white w-full max-w-md p-4 rounded-t-lg shadow-lg z-[10000]">
+//                         <div className="p-4">
+//                             <h2 className="font-semibold text-lg mb-4">Pilih kondisi Absensi</h2>
+//                             <div onClick={() => handleOptionSelect('WFO')} className="mb-4 p-4 bg-gray-100 rounded-lg flex items-center cursor-pointer">
+//                                 <img src="/images/wfo.png" alt="Office Icon" className="w-10 h-10 mr-4" />
+//                                 <div>
+//                                     <p className="font-semibold">Check-In WFO</p>
+//                                     <p className="text-gray-500 text-sm">Check in for working Inside the office</p>
+//                                 </div>
+//                                 <FiArrowRight className="ml-auto text-gray-500" />
+//                             </div>
+//                             <div onClick={() => handleOptionSelect('WFA/WFH')} className="p-4 bg-gray-100 rounded-lg flex items-center cursor-pointer">
+//                                 <img src="/images/wfh.png" alt="Home Icon" className="w-10 h-10 mr-4" />
+//                                 <div>
+//                                     <p className="font-semibold">Check-In WFA/WFH</p>
+//                                     <p className="text-gray-500 text-sm">Check in for working Outside the office</p>
+//                                 </div>
+//                                 <FiArrowRight className="ml-auto text-gray-500" />
+//                             </div>
+//                             <button onClick={closePopup} className="mt-4 align-text-top p-2 rounded-lg bg-primary-blue text-white">Close</button>
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+
+//             {/* Success Modal */}
+//             <SuccessModal
+//                 isVisible={isSuccessModalVisible}
+//                 onClose={closeSuccessModal}
+//             />
+
+//             {/* Error Modal */}
+//             <ErrorModal
+//                 isVisible={isErrorModalVisible}
+//                 onClose={closeErrorModal}
+//                 errorMessage={errorMessage}
+//             />
+//         </section>
+//     );
+// };
+
+// export default ScanContent;
