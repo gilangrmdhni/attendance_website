@@ -30,9 +30,7 @@ const Profile = () => {
         <title>NUN | Profile</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-
       <ProfileHeader />
-
       <main className="px-4 py-4">
         <div className='mb-20'>
           <ProfileSection title="General Information" items={generalInformationItems} />

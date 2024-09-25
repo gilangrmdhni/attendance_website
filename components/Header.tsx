@@ -7,7 +7,6 @@ import { ClockIcon } from '@heroicons/react/24/solid';
 import { fetchUser } from '../store/slices/userSlice';
 import { useRouter } from 'next/router';
 
-
 const Header = () => {
     const [checkinAt, setCheckinAt] = useState<string | null>(null);
     const [checkoutAt, setCheckoutAt] = useState<string | null>(null);
@@ -28,6 +27,8 @@ const Header = () => {
     const [confirmCheckout, setConfirmCheckout] = useState(false);
     const router = useRouter();
     const [greeting, setGreeting] = useState('');
+    const [showMessageInput, setShowMessageInput] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
 
 
     const fetchTimer = async () => {
@@ -166,24 +167,29 @@ const Header = () => {
         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     };
 
+    const handleMessageChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+        setMessage(event.target.value);
+    };
+
     const handleCheckout = async () => {
         if (checkoutLatitude === null || checkoutLongitude === null) {
             setSnackbarMessage("Checkout location is not available.");
             setSnackbarType('error');
             setSnackbarVisible(true);
+            setMessage('');
             return;
         }
 
         const workHours = 8 * 3600;
         if (elapsedTime < workHours && !confirmCheckout) {
             setShowConfirmDialog(true);
+            setShowMessageInput(true);
             return;
         } else {
             setWarningMessage(null);
         }
 
         const checkoutAt = new Date().toISOString();
-        const message = "Saya Pamit";
 
         try {
             if (checkinType === 'WFO') {
@@ -339,10 +345,25 @@ const Header = () => {
                         <p className="text-gray-600 mb-6">
                             Anda belum menyelesaikan waktu kerja 8 jam. Apakah Anda yakin ingin checkout?
                         </p>
+                        {/* Tambahkan logika untuk menampilkan input alasan */}
+                        {showMessageInput && (
+                            <div className="mb-4">
+                                <textarea
+                                    value={message}
+                                    onChange={handleMessageChange}
+                                    className="mt-1 p-2 border border-gray-300 rounded w-full"
+                                    placeholder="Masukkan alasan"
+                                    rows={4}
+                                />
+                            </div>
+                        )}
                         <div className="flex justify-end">
                             <button
                                 className="bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg mr-2"
-                                onClick={() => setShowConfirmDialog(false)}
+                                onClick={() => {
+                                    setShowConfirmDialog(false);
+                                    setShowMessageInput(false); // Menyembunyikan input alasan saat batal
+                                }}
                             >
                                 Batalkan
                             </button>

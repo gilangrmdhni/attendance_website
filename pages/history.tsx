@@ -34,6 +34,15 @@ const History = () => {
     }
   }, [dispatch, historyStatus, requestsStatus]);
 
+  useEffect(() => {
+    if (activeTab === 'Attendance' && historyStatus === 'idle') {
+      dispatch(fetchHistory());
+    } else if (activeTab === 'Time Off' && requestsStatus === 'idle') {
+      dispatch(fetchRequestApprovals());
+    }
+  }, [dispatch, activeTab, historyStatus, requestsStatus]);
+
+
   const filteredHistory = (history ?? []).filter((item: HistoryItemType) => {
     const matchesSearch = item.tipe.toLowerCase().includes(searchTerm.toLowerCase()) ||
       new Date(item.checkin_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).includes(searchTerm.toLowerCase());
@@ -41,7 +50,7 @@ const History = () => {
       (!filterEndDate || new Date(item.checkin_at) <= new Date(filterEndDate));
     return matchesSearch && matchesDateRange;
   });
-  
+
   const filteredRequests = (requests ?? []).filter((request: RequestApprovalType) => {
     const matchesSearch = request.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
       new Date(request.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).includes(searchTerm.toLowerCase());
@@ -49,7 +58,7 @@ const History = () => {
       (!filterEndDate || new Date(request.dates) <= new Date(filterEndDate));
     return matchesSearch && matchesDateRange;
   });
-  
+
   return (
     <MobileContainer>
       <Head>
@@ -58,19 +67,19 @@ const History = () => {
       </Head>
 
       <HistoryHeader
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterCategory={filterCategory}
-          setFilterCategory={setFilterCategory}
-          filterStatus={filterStatus}
-          setFilterStatus={setFilterStatus}
-          filterStartDate={filterStartDate}
-          setFilterStartDate={setFilterStartDate}
-          filterEndDate={filterEndDate}
-          setFilterEndDate={setFilterEndDate}
-        />
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        filterCategory={filterCategory}
+        setFilterCategory={setFilterCategory}
+        filterStatus={filterStatus}
+        setFilterStatus={setFilterStatus}
+        filterStartDate={filterStartDate}
+        setFilterStartDate={setFilterStartDate}
+        filterEndDate={filterEndDate}
+        setFilterEndDate={setFilterEndDate}
+      />
       <main className="px-4 pb-20">
         {activeTab === 'Attendance' && (
           <>
@@ -80,7 +89,7 @@ const History = () => {
               filteredHistory.map((item: HistoryItemType) => (
                 <HistoryItem
                   key={item.id}
-                  type={item.tipe === 'wfo' ? 'Office' : 'Anywhere'}
+                  type={item.tipe === 'work from anywhere/home' ? 'Anywhere' : item.tipe === 'work from office' ? 'Office' : 'Unknown'}
                   date={new Date(item.checkin_at).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   startTime={new Date(item.checkin_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'}
                   endTime={item.checkout_at !== '0001-01-01T00:00:00Z' ? new Date(item.checkout_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB' : 'Not Checked Out'}
@@ -98,17 +107,38 @@ const History = () => {
             <div className="text-gray-500 text-sm my-2 text-center"></div>
             {requestsStatus === 'loading' && <p>Loading time off requests...</p>}
             {requestsStatus === 'succeeded' && filteredRequests.length > 0 ? (
-              filteredRequests.map((item: RequestApprovalType) => (
-                <TimeOffItem
-                  key={item.id}
-                  type={item.category === 'TimeOff' ? 'Sick' : 'Other'}
-                  reason={item.description}
-                  date={new Date(item.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                  duration={item.status === 'approved' ? 'Full Day' : 'Pending'}
-                />
-              )) 
+              filteredRequests.map((item: RequestApprovalType) => {
+                // Menentukan tipe berdasarkan kategori
+                let type;
+                switch (item.category) {
+                  case 'Izin':
+                    type = 'Izin';
+                    break;
+                  case 'Reimbursment':
+                    type = 'Reimbursement';
+                    break;
+                  case 'TimeOff':
+                    type = 'Sick';
+                    break;
+                  case 'Lembur':
+                    type = 'Overtime';
+                    break;
+                  default:
+                    type = 'Other';
+                }
+
+                return (
+                  <TimeOffItem
+                    key={item.id}
+                    type={type}
+                    reason={item.description}
+                    date={new Date(item.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    duration={item.status === 'approved' ? 'Full Day' : 'Pending'}
+                  />
+                );
+              })
             ) : (
-              <p>No time off requests found.</p>          
+              <p>No time off requests found.</p>
             )}
             {requestsStatus === 'failed' && <p>Error loading time off data. Please try again later.</p>}
           </>

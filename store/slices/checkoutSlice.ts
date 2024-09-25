@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { CheckoutPayload, CheckoutResponse } from '../types/checkoutTypes';
 
+// Fungsi checkoutWFO yang diperbarui
 export const checkoutWFO = createAsyncThunk<CheckoutResponse, CheckoutPayload>(
   'checkout/checkoutWFO',
   async (payload, { rejectWithValue }) => {
@@ -14,6 +15,7 @@ export const checkoutWFO = createAsyncThunk<CheckoutResponse, CheckoutPayload>(
   }
 );
 
+// Fungsi checkoutWFAWFH yang diperbarui
 export const checkoutWFAWFH = createAsyncThunk<CheckoutResponse, CheckoutPayload>(
   'checkout/checkoutWFAWFH',
   async (payload, { rejectWithValue }) => {
@@ -26,18 +28,22 @@ export const checkoutWFAWFH = createAsyncThunk<CheckoutResponse, CheckoutPayload
   }
 );
 
+// Modifikasi CheckoutState jika diperlukan
 interface CheckoutState {
   data: CheckoutResponse | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  message: string | null; 
 }
 
 const initialState: CheckoutState = {
   data: null,
   status: 'idle',
   error: null,
+  message: null, 
 };
 
+// Sisa kode tetap sama
 const checkoutSlice = createSlice({
   name: 'checkout',
   initialState,

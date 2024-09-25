@@ -7,13 +7,13 @@ import { login } from '../store/slices/authSlice';
 import MobileContainer from '@/components/MobileContainer';
 
 const Login = () => {
-    const [email, setEmail] = useState(''); // Tambahkan state untuk email
-    const [username, setUsername] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { loading, token } = useSelector((state: RootState) => state.auth);
+    const [greeting, setGreeting] = useState('');
 
     useEffect(() => {
         if (token) {
@@ -21,15 +21,36 @@ const Login = () => {
         }
     }, [token, router]);
 
+    const isEmail = (input: string) => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(input);
+    };
+
     const handleLogin = async () => {
-        if (!email || !username || !password) {
-            setError("Email, Username, and Password are required");
+        if (!identifier || !password) {
+            setError("Email/Username and password are required");
             return;
         }
+
+        const loginData = isEmail(identifier)
+            ? { email: identifier, password }
+            : { username: identifier, password };
+
         try {
-            await dispatch(login({ email, username, password })).unwrap();
+            await dispatch(login(loginData)).unwrap();
         } catch (err) {
             setError("Login failed. Please check your credentials.");
+        }
+    };
+
+    const getGreeting = () => {
+        const currentHour = new Date().getHours();
+        if (currentHour < 12) {
+            return 'Good Morning 👋';
+        } else if (currentHour < 18) {
+            return 'Good Afternoon 😊';
+        } else {
+            return 'Good Evening 🌙';
         }
     };
 
@@ -59,27 +80,17 @@ const Login = () => {
 
                     {/* Form */}
                     <div className="p-6 py-10">
-                        <p className="text-gray-700 text-sm mb-1">Good Morning 👋</p>
+                        <p className="text-gray-700 text-sm mb-1">{greeting}</p>
                         <h1 className="text-xl font-semibold mb-4">Welcome Back, Login to Continue your activity!</h1>
                         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-                        <label htmlFor="email" className="block text-gray-600 font-medium mb-1">Email</label>
+                        <label htmlFor="identifier" className="block text-gray-600 font-medium mb-1">Email or Username</label>
                         <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Insert your Email here"
-                            className="w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
-
-                        <label htmlFor="username" className="block text-gray-600 font-medium mb-1">Username</label>
-                        <input
-                            id="username"
+                            id="identifier"
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Insert your Username here"
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
+                            placeholder="Enter your Email or Username"
                             className="w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
 
@@ -89,7 +100,7 @@ const Login = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Insert your Password here"
+                            placeholder="Enter your Password"
                             className="w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
 

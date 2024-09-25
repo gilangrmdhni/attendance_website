@@ -1,6 +1,29 @@
 const TimeOffItem = ({ type, reason, date, duration }: any) => {
-    const icon = type === "Sick" ? "/icons/sick.png" : "/icons/sick.png";
-    const typeName = type === "Sick" ? "Izin Sakit" : "Izin Cuti";
+    // Menentukan ikon dan nama berdasarkan tipe
+    let icon;
+    let typeName;
+
+    switch (type) {
+        case "Sick":
+            icon = "/icons/sick.png";
+            typeName = "Izin Sakit";
+            break;
+        case "Leave":
+            icon = "/icons/sick.png"; // Ganti dengan ikon yang sesuai untuk Izin
+            typeName = "Izin Cuti";
+            break;
+        case "Reimbursement":
+            icon = "/icons/sick.png"; // Ganti dengan ikon yang sesuai untuk Reimbursment
+            typeName = "Reimbursment";
+            break;
+        case "Overtime":
+            icon = "/icons/sick.png"; // Ganti dengan ikon yang sesuai untuk Lembur
+            typeName = "Lembur";
+            break;
+        default:
+            icon = "/icons/sick.png"; // Ikon default untuk kategori yang tidak terdaftar
+            typeName = "Other"; // Nama default
+    }
 
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center">

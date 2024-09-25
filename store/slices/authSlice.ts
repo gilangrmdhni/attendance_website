@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance'; 
 import { AuthState, LoginPayload, LoginResponse } from '../types/authTypes';
 
 const initialState: AuthState = {
@@ -9,9 +9,12 @@ const initialState: AuthState = {
     error: null,
 };
 
-export const login = createAsyncThunk('auth/login', async (userData: LoginPayload, thunkAPI) => {
+// Thunk untuk melakukan login
+export const login = createAsyncThunk('auth/login', async (loginData: { email?: string, username?: string, password: string }, thunkAPI) => {
     try {
-        const response = await axios.post<LoginResponse>('https://api.attendance.nuncorp.id/api/auth/login', userData);
+        const response = await axiosInstance.post<LoginResponse>('/auth/login', {
+            ...loginData,
+        });
         const token = response.data.meta.token_string;
         const user = response.data.body;
         localStorage.setItem('token', token);
