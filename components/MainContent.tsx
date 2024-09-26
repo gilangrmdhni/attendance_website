@@ -55,7 +55,7 @@ const MainContent = () => {
             <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={handlePrevMonth}
-                    className="flex items-center justify-center w-8 h-8  text-primary-blue rounded-full "
+                    className="flex items-center justify-center w-8 h-8 text-primary-blue rounded-full "
                     aria-label="Previous Month"
                 >
                     <ChevronLeftIcon className="w-5 h-5" />
