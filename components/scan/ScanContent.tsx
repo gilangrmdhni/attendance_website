@@ -111,7 +111,7 @@ const ScanContent = () => {
         setIsCheckedIn(false); // Reset checked-in status
         window.location.reload();
         router.push('/'); // Arahkan ke halaman home
-    };    
+    };
 
     const closeErrorModal = () => {
         setIsErrorModalVisible(false);
@@ -158,7 +158,7 @@ const ScanContent = () => {
             {/* File Upload Section */}
             <div className="bg-white p-4 rounded-xl shadow-md mb-4 text-center">
                 <div
-                    className="border-2 border-dashed border-blue-500 rounded-lg p-4 mb-4 bg-blue-100 cursor-pointer"
+                    className="border-2 border-dashed border-blue-500 rounded-lg p-10 mb-4 bg-blue-100 cursor-pointer"
                     onClick={() => document.getElementById('fileInput')?.click()}
                 >
                     <img src="/images/camera.png" alt="Camera Icon" className="w-8 h-8 mx-auto mb-2" />
@@ -168,8 +168,9 @@ const ScanContent = () => {
                         onChange={handleFileChange}
                         className="hidden"
                         id="fileInput"
+                        capture="environment" // Atribut ini akan mengarahkan ke kamera belakang jika tersedia
                     />
-                    <label className="text-primary-blue text-sm">Ambil atau Upload foto selfie</label>
+                    <label className="text-primary-blue text-sm">Ambil foto selfie</label>
                     {filePreview && (
                         <div className="mt-4">
                             <img
