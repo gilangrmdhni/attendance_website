@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosInstance from '../../utils/axiosInstance'; 
+import axiosInstance from '../../utils/axiosInstance';
 import { AuthState, LoginPayload, LoginResponse } from '../types/authTypes';
 
 const initialState: AuthState = {
@@ -9,8 +9,7 @@ const initialState: AuthState = {
     error: null,
 };
 
-// Thunk untuk melakukan login
-export const login = createAsyncThunk('auth/login', async (loginData: { email?: string, username?: string, password: string }, thunkAPI) => {
+export const login = createAsyncThunk('auth/login', async (loginData: { username: string, password: string }, thunkAPI) => {
     try {
         const response = await axiosInstance.post<LoginResponse>('/auth/login', {
             ...loginData,
@@ -26,6 +25,7 @@ export const login = createAsyncThunk('auth/login', async (loginData: { email?: 
         return thunkAPI.rejectWithValue('An unknown error occurred');
     }
 });
+
 
 const authSlice = createSlice({
     name: 'auth',

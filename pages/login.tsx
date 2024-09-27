@@ -7,7 +7,7 @@ import { login } from '../store/slices/authSlice';
 import MobileContainer from '@/components/MobileContainer';
 
 const Login = () => {
-    const [identifier, setIdentifier] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
@@ -21,20 +21,15 @@ const Login = () => {
         }
     }, [token, router]);
 
-    const isEmail = (input: string) => {
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailPattern.test(input);
-    };
+
 
     const handleLogin = async () => {
-        if (!identifier || !password) {
-            setError("Email/Username and password are required");
+        if (!username || !password) {
+            setError("Username and password are required");
             return;
         }
 
-        const loginData = isEmail(identifier)
-            ? { email: identifier, password }
-            : { username: identifier, password };
+        const loginData = { username, password };
 
         try {
             await dispatch(login(loginData)).unwrap();
@@ -52,6 +47,8 @@ const Login = () => {
         } else {
             return 'Good Evening 🌙';
         }
+
+        setGreeting(getGreeting());
     };
 
     return (
@@ -88,8 +85,8 @@ const Login = () => {
                         <input
                             id="identifier"
                             type="text"
-                            value={identifier}
-                            onChange={(e) => setIdentifier(e.target.value)}
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             placeholder="Enter your Email or Username"
                             className="w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
