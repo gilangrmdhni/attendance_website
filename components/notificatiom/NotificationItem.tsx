@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 const NotificationsComponent: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const notifications = useSelector((state: RootState) => state.notifications.notifications) || []; // Pastikan tidak null
+    const notifications = useSelector((state: RootState) => state.notifications.notifications) || [];
     const status = useSelector((state: RootState) => state.notifications.status);
     const error = useSelector((state: RootState) => state.notifications.error);
 
@@ -26,7 +26,7 @@ const NotificationsComponent: React.FC = () => {
 
     return (
         <div className="space-y-4">
-            {notifications.length === 0 ? ( // Memeriksa apakah notifikasi kosong
+            {notifications.length === 0 ? (
                 <div className="text-gray-500 text-center">
                     Tidak ada notifikasi saat ini.
                 </div>
@@ -59,7 +59,7 @@ const NotificationsComponent: React.FC = () => {
                                 )}
                             </div>
                             <span className={`text-sm ${notification.status ? 'text-gray-500' : 'text-gray-500'}`}>
-                                {notification.status || 'Absensi'}
+                                {notification.status || 'activity'}
                             </span>
                             <span className="text-gray-400 text-xs ml-auto">
                                 {new Date(notification.created_at).toLocaleDateString('id-ID', {
@@ -80,6 +80,20 @@ const NotificationsComponent: React.FC = () => {
                         <p className="text-sm text-gray-600">
                             {notification.description}
                         </p>
+
+                        {/* Slip Gaji (Attachment) */}
+                        {notification.attachment && (
+                            <div className="text-sm text-blue-500 mt-2">
+                                <a
+                                    href={`https://your-api-url.com/uploads/${notification.attachment}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline"
+                                >
+                                    Unduh Slip Gaji (PDF)
+                                </a>
+                            </div>
+                        )}
 
                         {/* Dates or Check-in Time */}
                         {notification.dates && (
