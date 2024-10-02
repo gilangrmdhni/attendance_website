@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/router';
 import Modal from '../../utils/Modal'; // Import the Modal component
+import { toast } from 'react-toastify'; // Import toast for notifications
 
 const PersonalInformation = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -20,9 +21,15 @@ const PersonalInformation = () => {
     // Local state for edit mode
     const [isEditing, setIsEditing] = useState(false);
 
+    // Backup original values to restore on cancel
+    const [originalName, setOriginalName] = useState('');
+    const [originalEmail, setOriginalEmail] = useState('');
+    const [originalPhoneNumber, setOriginalPhoneNumber] = useState('');
+
     // Local state for error message
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchUser());
@@ -33,6 +40,11 @@ const PersonalInformation = () => {
             setName(user.full_name || '');
             setEmail(user.email || '');
             setPhoneNumber(user.phone_number || '');
+
+            // Set original values to enable cancel functionality
+            setOriginalName(user.full_name || '');
+            setOriginalEmail(user.email || '');
+            setOriginalPhoneNumber(user.phone_number || '');
         }
     }, [user]);
 
@@ -50,7 +62,11 @@ const PersonalInformation = () => {
             ? `https://api.attendance.nuncorp.id${user.picture}`
             : '/icons/userEdit.png';
 
-    const handleSave = async () => {
+    const handleSave = () => {
+        setIsModalOpen(true); // Tampilkan modal konfirmasi saat tombol Save diklik
+    };
+
+    const confirmSave = async () => {
         const profileData = {
             full_name: name,
             email: email,
@@ -61,7 +77,13 @@ const PersonalInformation = () => {
             await dispatch(updateUserProfile(profileData)).unwrap();
             setIsEditing(false); // Kembali ke mode tampilan setelah berhasil menyimpan
             setErrorMessage(null); // Reset error message on success
-            setIsModalOpen(false); // Close modal if it was open
+            setIsModalOpen(false); // Tutup modal jika terbuka
+
+            // Fetch user data again to get the updated information
+            await dispatch(fetchUser());
+
+            // Notify the user of successful update
+            toast.success('Profile updated successfully!');
         } catch (error: any) {
             // Set error message based on the response from the API
             if (error.code === 400 && error.error) {
@@ -71,11 +93,6 @@ const PersonalInformation = () => {
             }
             setIsModalOpen(true); // Open modal on error
         }
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setErrorMessage(null); // Clear error message on close
     };
 
     return (
@@ -179,22 +196,48 @@ const PersonalInformation = () => {
                         />
                     </div>
                     <p className="text-xs text-gray-400 mb-4">
-                        * make sure to use your real information like on your identity card (KTP) for legal reasons
+                        * make sure to double-check before saving your changes.
                     </p>
-                    <button
-                        onClick={isEditing ? handleSave : () => setIsEditing(true)}
-                        className="w-full py-2 bg-primary-blue text-white rounded-md hover:bg-blue-800 transition-all"
-                    >
-                        {isEditing ? 'Save' : 'Edit'}
-                    </button>
+                    {isEditing ? (
+                        <div className="flex justify-between">
+                            <button
+                                onClick={handleSave}
+                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="w-full px-4 py-2 bg-gray-300 text-primary-blue rounded-md hover:bg-gray-400"
+                        >
+                            Edit
+                        </button>
+                    )}
                 </div>
             </div>
-
-            {/* Modal for error messages */}
-            {isModalOpen && errorMessage && (
-                <Modal message={errorMessage} onClose={closeModal} />
+            {isModalOpen && (
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <p className="text-gray-700 font-semibold">Confirm Changes</p>
+                    <p className="text-gray-500">Are you sure you want to save these changes?</p>
+                    <div className="flex justify-end mt-4">
+                        <button
+                            onClick={confirmSave}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md mr-2 hover:bg-blue-700 transition duration-200"
+                        >
+                            Simpan
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(false)}
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </Modal>
             )}
-        </div >
+        </div>
     );
 };
 
