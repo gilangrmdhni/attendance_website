@@ -85,7 +85,7 @@ const NotificationsComponent: React.FC = () => {
                         {notification.attachment && (
                             <div className="text-sm text-blue-500 mt-2">
                                 <a
-                                    href={`https://your-api-url.com/uploads/${notification.attachment}`}
+                                    href={`/storage/attachment/${notification.attachment}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="underline"
@@ -94,7 +94,6 @@ const NotificationsComponent: React.FC = () => {
                                 </a>
                             </div>
                         )}
-
                         {/* Dates or Check-in Time */}
                         {notification.dates && (
                             <p className="text-sm text-gray-500">
