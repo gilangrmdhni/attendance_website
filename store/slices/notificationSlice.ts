@@ -9,6 +9,8 @@ interface Notification {
   status?: string;
   dates?: string;
   created_at: string;
+  attachment?: string;
+
 }
 
 interface NotificationState {
