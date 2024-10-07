@@ -62,6 +62,9 @@ const ProfileHeader = () => {
       router.push('/login');
     }
   };
+  const handleNotificationClick = () => {
+    router.push('/Notifications');
+  };
 
   // Wait until the component is mounted to render client-side content
   if (!isMounted) {
@@ -78,6 +81,7 @@ const ProfileHeader = () => {
           width={24}
           height={24}
           className="cursor-pointer"
+          onClick={handleNotificationClick}
         />
       </div>
       <div className="bg-white p-4 rounded-lg flex items-center">
