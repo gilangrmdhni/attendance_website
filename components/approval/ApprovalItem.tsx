@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { fetchApprovalRequests, updateApprovalStatus } from '../../store/slices/approvalRequestSlice';
 import { RootState, useAppDispatch } from '../../store/store';
@@ -9,12 +9,42 @@ const ApprovalItem = () => {
     const router = useRouter();
     const { requests, status, error } = useSelector((state: RootState) => state.approval);
 
+    // State untuk popup dan pesan
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [rejectMessage, setRejectMessage] = useState('');
+    const [currentRequestId, setCurrentRequestId] = useState<number | null>(null);
+
     useEffect(() => {
         dispatch(fetchApprovalRequests());
     }, [dispatch]);
 
     const handleApproval = (request_id: number, status: boolean) => {
         dispatch(updateApprovalStatus({ request_id, status }));
+    };
+
+    const handleReject = (request_id: number) => {
+        setCurrentRequestId(request_id);
+        setIsPopupOpen(true);
+    };
+
+    const confirmReject = () => {
+        if (currentRequestId !== null) {
+            // Kirim pesan saat menolak
+            dispatch(updateApprovalStatus({ 
+                request_id: currentRequestId, 
+                status: false, 
+                message: rejectMessage // Sertakan pesan di sini
+            }));
+        }
+        setIsPopupOpen(false);
+        setRejectMessage('');
+        setCurrentRequestId(null);
+    };
+
+    const handlePopupClose = () => {
+        setIsPopupOpen(false);
+        setRejectMessage('');
+        setCurrentRequestId(null);
     };
 
     return (
@@ -32,7 +62,7 @@ const ApprovalItem = () => {
                                 <div className="mt-4 flex justify-between">
                                     <button
                                         className="bg-white border-2 border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-white"
-                                        onClick={() => handleApproval(request.request_id, false)}
+                                        onClick={() => handleReject(request.request_id)}
                                     >
                                         Reject
                                     </button>
@@ -44,10 +74,32 @@ const ApprovalItem = () => {
                                     </button>
                                 </div>
                             )}
-                            {/* Menambahkan garis pemisah */}
                             {index < requests.length - 1 && <hr className="my-4 border-gray-300" />}
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Popup untuk menolak permintaan */}
+            {isPopupOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white p-5 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-semibold mb-4">Reject Request</h3>
+                        <textarea
+                            className="w-full p-2 border border-gray-300 rounded"
+                            placeholder="Masukkan pesan penolakan..."
+                            value={rejectMessage}
+                            onChange={(e) => setRejectMessage(e.target.value)}
+                        />
+                        <div className="mt-4 flex justify-end">
+                            <button className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={handlePopupClose}>
+                                Cancel
+                            </button>
+                            <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={confirmReject}>
+                                Confirm Reject
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

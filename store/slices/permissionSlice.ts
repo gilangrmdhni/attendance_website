@@ -4,17 +4,23 @@ import axiosInstance from '../../utils/axiosInstance';
 import axios, { AxiosError } from 'axios';
 
 interface PermissionRequest {
-    permission: string;
+    category_permission_id: string;
     description: string;
-    dates: string; // Pastikan format tanggal sesuai yang diharapkan API
-    attachment: File; // Menyesuaikan dengan tipe file
+    dates: string; 
+    attachment: File;
+}
+
+interface Category {
+    id: number;
+    name: string;
+    description: string;
 }
 
 export const submitPermissionRequest = createAsyncThunk(
     'permission/submitRequest',
     async (formData: PermissionRequest, { rejectWithValue }) => {
         const form = new FormData();
-        form.append('permission', formData.permission);
+        form.append('category_permission_id', String(Number(formData.category_permission_id)));
         form.append('description', formData.description);
         form.append('dates', formData.dates);
         form.append('attachment', formData.attachment);
@@ -22,10 +28,29 @@ export const submitPermissionRequest = createAsyncThunk(
         return response.data;
     }
 );
+
+export const fetchCategories = createAsyncThunk(
+    'permission/fetchCategories',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get('/category-permission/all');
+            return response.data.body; // Mengambil kategori dari "body"
+        } catch (err: AxiosError | unknown) {
+            if (axios.isAxiosError(err) && err.response) {
+                return rejectWithValue(err.response.data.message);
+            }
+            return rejectWithValue('An error occurred while fetching categories');
+        }
+    }
+);
+
 const initialState = {
     data: null as any,
     status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
     error: null as string | null,
+    categories: [] as Category[],  // Menyimpan kategori izin
+    categoriesStatus: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
+    categoriesError: null as string | null,
 };
 
 const permissionSlice = createSlice({
@@ -33,6 +58,7 @@ const permissionSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: (builder) => {
+        // Untuk submit permission request
         builder
             .addCase(submitPermissionRequest.pending, (state) => {
                 state.status = 'loading';
@@ -45,6 +71,21 @@ const permissionSlice = createSlice({
             .addCase(submitPermissionRequest.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload as string;
+            });
+
+        // Untuk fetch kategori izin
+        builder
+            .addCase(fetchCategories.pending, (state) => {
+                state.categoriesStatus = 'loading';
+                state.categoriesError = null;
+            })
+            .addCase(fetchCategories.fulfilled, (state, action) => {
+                state.categoriesStatus = 'succeeded';
+                state.categories = action.payload;
+            })
+            .addCase(fetchCategories.rejected, (state, action) => {
+                state.categoriesStatus = 'failed';
+                state.categoriesError = action.payload as string;
             });
     },
 });

@@ -37,7 +37,7 @@ const formConfigurations: Record<string, FormConfig> = {
     permission: {
         title: 'Izin Form',
         fields: [
-            { type: 'text', label: 'Judul', name: 'permission' },
+            { type: 'select', label: 'Kategori', name: 'category_permission_id' },
             { type: 'date', label: 'Tanggal', name: 'dates' },
             { type: 'textarea', label: 'Deskripsi', name: 'description' },
             { type: 'file', label: 'Attachment', name: 'attachment' }

@@ -10,6 +10,13 @@ interface ApprovalRequest {
     status: string;
 }
 
+
+interface UpdateApprovalStatusPayload {
+    request_id: number;
+    status: boolean;
+    message?: string; // Buat message opsional
+}
+
 // Async thunk untuk mengambil data request approval
 export const fetchApprovalRequests = createAsyncThunk(
     'approval/fetchRequests',
@@ -23,12 +30,15 @@ export const fetchApprovalRequests = createAsyncThunk(
     }
 );
 
-// Async thunk untuk mengupdate status approval
 export const updateApprovalStatus = createAsyncThunk(
     'approval/updateStatus',
-    async ({ request_id, status }: { request_id: number, status: boolean }, { rejectWithValue }) => {
+    async ({ request_id, status, message }: UpdateApprovalStatusPayload, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put(`/request-approval/update?request_id=${request_id}&status=${status}`);
+            const response = await axiosInstance.put(`/request-approval/update`, {
+                request_id,
+                status,
+                message, // Sertakan message di sini
+            });
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response.data);
