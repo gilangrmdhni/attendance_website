@@ -84,7 +84,7 @@ const History = () => {
         {activeTab === 'Attendance' && (
           <>
             <div className="text-gray-500 text-sm my-2 text-center"></div>
-            {historyStatus === 'loading' && <p>Loading attendance data...</p>}
+            {historyStatus === 'loading' && <p>Memuat data kehadiran...</p>}
             {historyStatus === 'succeeded' && filteredHistory.length > 0 ? (
               filteredHistory.map((item: HistoryItemType) => (
                 <HistoryItem
@@ -97,15 +97,15 @@ const History = () => {
                 />
               ))
             ) : (
-              <p>No attendance records found.</p>
+              <p>Tidak ada catatan kehadiran yang ditemukan.</p>
             )}
-            {historyStatus === 'failed' && <p>Error loading attendance data. Please try again later.</p>}
+            {historyStatus === 'failed' && <p>Terjadi kesalahan saat memuat data. Silakan coba lagi nanti.</p>}
           </>
         )}
         {activeTab === 'Time Off' && (
           <>
             <div className="text-gray-500 text-sm my-2 text-center"></div>
-            {requestsStatus === 'loading' && <p>Loading time off requests...</p>}
+            {requestsStatus === 'loading' && <p>Memuat permintaan izin...</p>}
             {requestsStatus === 'succeeded' && filteredRequests.length > 0 ? (
               filteredRequests.map((item: RequestApprovalType) => {
                 // Menentukan tipe berdasarkan kategori
@@ -118,13 +118,13 @@ const History = () => {
                     type = 'Reimbursement';
                     break;
                   case 'TimeOff':
-                    type = 'Sick';
+                    type = 'Sakit';
                     break;
                   case 'Lembur':
-                    type = 'Overtime';
+                    type = 'Lembur';
                     break;
                   default:
-                    type = 'Other';
+                    type = 'Lainnya';
                 }
 
                 return (
@@ -138,9 +138,9 @@ const History = () => {
                 );
               })
             ) : (
-              <p>No time off requests found.</p>
+              <p>Tidak ada permintaan izin yang ditemukan.</p>
             )}
-            {requestsStatus === 'failed' && <p>Error loading time off data. Please try again later.</p>}
+            {requestsStatus === 'failed' && <p>Terjadi kesalahan saat memuat data. Silakan coba lagi nanti.</p>}
           </>
         )}
       </main>

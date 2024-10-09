@@ -82,7 +82,7 @@ const ChangePassword = () => {
           <button onClick={() => router.back()} className='mr-4'>
             <ArrowLeftIcon className="w-6 h-6" />
           </button>
-          <h1 className='text-2xl font-bold'>Change Password</h1>
+          <h1 className='text-2xl font-bold'>Ubah Kata Sandi</h1>
         </div>
       </div>
       <div className="p-4">
@@ -157,7 +157,7 @@ const ChangePassword = () => {
               <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m0 0V8h.01M12 18h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>No email found. Please update your profile to include an email address.</span>
+              <span>Tidak ada alamat email yang ditemukan. Harap perbarui profil Anda untuk menyertakan alamat email.</span>
             </div>
           )}
           {/* Pesan sukses atau error */}

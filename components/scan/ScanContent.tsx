@@ -199,20 +199,20 @@ const ScanContent = () => {
                             <div onClick={() => handleOptionSelect('WFO')} className="mb-4 p-4 bg-gray-100 rounded-lg flex items-center cursor-pointer">
                                 <img src="/images/wfo.png" alt="Office Icon" className="w-10 h-10 mr-4" />
                                 <div>
-                                    <p className="font-semibold">Check-In WFO</p>
-                                    <p className="text-gray-500 text-sm">Check in for working Inside the office</p>
+                                    <p className="font-semibold">Absen WFO</p>
+                                    <p className="text-gray-500 text-sm">Melakukan absenin untuk bekerja di kantor</p>
                                 </div>
                                 <FiArrowRight className="ml-auto text-gray-500" />
                             </div>
                             <div onClick={() => handleOptionSelect('WFA/WFH')} className="p-4 bg-gray-100 rounded-lg flex items-center cursor-pointer">
                                 <img src="/images/wfh.png" alt="Home Icon" className="w-10 h-10 mr-4" />
                                 <div>
-                                    <p className="font-semibold">Check-In WFA/WFH</p>
-                                    <p className="text-gray-500 text-sm">Check in for working Outside the office</p>
+                                    <p className="font-semibold">Absen WFA/WFH</p>
+                                    <p className="text-gray-500 text-sm">Melakukan absensi untuk bekerja di luar kantor</p>
                                 </div>
                                 <FiArrowRight className="ml-auto text-gray-500" />
                             </div>
-                            <button onClick={closePopup} className="mt-4 w-full align-text-top p-2 rounded-lg bg-primary-blue text-white">Close</button>
+                            <button onClick={closePopup} className="mt-4 w-full align-text-top p-2 rounded-lg bg-primary-blue text-white">Keluar</button>
                         </div>
                     </div>
                 </div>

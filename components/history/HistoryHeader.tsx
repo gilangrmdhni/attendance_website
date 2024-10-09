@@ -53,7 +53,7 @@ const HistoryHeader = ({
 
     return (
         <header className="bg-primary-blue text-white p-4 rounded-b-lg relative bg-[url('/images/header.png')] bg-cover bg-center">
-            <h1 className="text-xl font-semibold">History</h1>
+            <h1 className="text-xl font-semibold">Riwayat</h1>
             <div className="flex items-center mt-4 relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
@@ -76,13 +76,13 @@ const HistoryHeader = ({
                     className={`px-4 py-2 rounded-lg mx-2 ${activeTab === 'Attendance' ? 'bg-blue-800 text-white' : 'bg-white text-gray-400'}`}
                     onClick={() => setActiveTab('Attendance')}
                 >
-                    Attendance
+                    Kehadrian
                 </button>
                 <button
                     className={`px-4 py-2 rounded-lg mx-2 ${activeTab === 'Time Off' ? 'bg-blue-800 text-white' : 'bg-white text-gray-400'}`}
                     onClick={() => setActiveTab('Time Off')}
                 >
-                    Time Off
+                    Izin
                 </button>
             </div>
             {isFilterOpen && (

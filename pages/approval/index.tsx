@@ -26,7 +26,7 @@ const ApprovalRequests = () => {
                     >
                         <ArrowLeftIcon className="w-6 h-6" />
                     </button>
-                    <h1 className="ml-4 text-xl font-semibold">Approval Requests</h1>
+                    <h1 className="ml-4 text-xl font-semibold">Permintaan Persetujuan</h1>
                 </div>
             </header>
             <main className="px-4 py-4">

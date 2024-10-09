@@ -73,12 +73,12 @@ const Header = () => {
 
     const updateGreeting = () => {
         const currentHour = new Date().getHours();
-        let newGreeting = 'Good Morning 🙌'; // Default greeting
+        let newGreeting = 'Selamat Pagi 🙌'; // Default greeting
 
-        if (currentHour >= 12 && currentHour < 17) {
-            newGreeting = 'Good Afternoon 🌞';
-        } else if (currentHour >= 17) {
-            newGreeting = 'Good Evening 🌙';
+        if (currentHour >= 10 && currentHour < 14) {
+            newGreeting = 'Selamat Siang 🌞';
+        } else if (currentHour >= 14) {
+            newGreeting = 'Selamat Sore 🌙';
         }
 
         setGreeting(newGreeting);
@@ -173,82 +173,58 @@ const Header = () => {
 
     const handleCheckout = async () => {
         if (checkoutLatitude === null || checkoutLongitude === null) {
-            setSnackbarMessage("Checkout location is not available.");
-            setSnackbarType('error');
-            setSnackbarVisible(true);
-            setMessage('');
+            showSnackbar("Lokasi checkout tidak tersedia.", 'error');
             return;
         }
 
-        const workHours = 8 * 3600;
+        const workHours = 8 * 3600; // 8 jam dalam detik
         if (elapsedTime < workHours && !confirmCheckout) {
             setShowConfirmDialog(true);
             setShowMessageInput(true);
             return;
-        } else {
-            setWarningMessage(null);
         }
 
         const checkoutAt = new Date().toISOString();
 
         try {
-            if (checkinType === 'WFO') {
-                await checkoutWFO(checkoutAt, message);
-            } else {
-                await checkoutWFAWFH(checkoutAt, message);
-            }
-            setSnackbarMessage("Checkout successful!");
-            setSnackbarType('success');
-            setSnackbarVisible(true);
+            await handleCheckoutAPI(checkoutAt, message, checkinType);
+            showSnackbar("Checkout berhasil!", 'success');
             setCheckoutSuccessful(true);
             setButtonDisabled(true);
-            setElapsedTime(0);
-            setCheckinAt(null);
-            setCheckoutAt(checkoutAt);
-
-            localStorage.setItem('checkoutSuccessful', 'true');
-            localStorage.removeItem('checkinAt');
+            resetCheckoutStates();
         } catch (error) {
-            console.error("Error during checkout:", error);
-            setSnackbarMessage("Error during checkout. Please try again.");
-            setSnackbarType('error');
-            setSnackbarVisible(true);
+            console.error("Kesalahan saat checkout:", error);
+            showSnackbar("Kesalahan saat checkout. Silakan coba lagi.", 'error');
         }
     };
 
-    const checkoutWFO = async (checkoutAt: string, message: string) => {
-        try {
-            const payload = {
-                checkout_at: checkoutAt,
-                message: message,
-                elapsed_time: elapsedTime,
-                checkout_latitude: checkoutLatitude,
-                checkout_longitude: checkoutLongitude,
-            };
-
-            await axiosInstance.put('/attendance/wfo/out', payload);
-        } catch (error) {
-            console.error("Error during WFO checkout:", error);
-            throw error;
-        }
+    const showSnackbar = (message: string, type: 'success' | 'error' | 'warning') => {
+        setSnackbarMessage(message);
+        setSnackbarType(type);
+        setSnackbarVisible(true);
     };
 
-    const checkoutWFAWFH = async (checkoutAt: string, message: string) => {
-        try {
-            const payload = {
-                checkout_at: checkoutAt,
-                message: message,
-                elapsed_time: elapsedTime,
-                checkout_latitude: checkoutLatitude,
-                checkout_longitude: checkoutLongitude,
-            };
-
-            await axiosInstance.put('/attendance/wfa/out', payload);
-        } catch (error) {
-            console.error("Error during WFA/WFH checkout:", error);
-            throw error;
-        }
+    const resetCheckoutStates = () => {
+        setElapsedTime(0);
+        setCheckinAt(null);
+        setCheckoutAt(null);
     };
+
+    const handleCheckoutAPI = async (checkoutAt: string, message: string, type: 'WFO' | 'WFA/WFH') => {
+        const endpoint = type === 'WFO' ? '/attendance/wfo/out' : '/attendance/wfa/out';
+        const payload = {
+            checkout_at: checkoutAt,
+            message: message,
+            elapsed_time: elapsedTime,
+            checkout_latitude: checkoutLatitude,
+            checkout_longitude: checkoutLongitude,
+        };
+
+        await axiosInstance.put(endpoint, payload);
+    };
+
+
+
 
     const allowedPositions = [
         "Vice President Delivery And Operation",
@@ -322,7 +298,7 @@ const Header = () => {
                         </div>
                         <div className="flex justify-center items-center space-x-1 text-gray-400 text-sm">
                             <ClockIcon className="w-4 h-4" />
-                            <span className='text-gray-400'>Work hour time</span>
+                            <span className='text-gray-400'>Waktu jam kerja</span>
                         </div>
                         <button
                             className={`${buttonDisabled
@@ -332,7 +308,7 @@ const Header = () => {
                             onClick={handleCheckout}
                             disabled={buttonDisabled}
                         >
-                            {checkoutSuccessful ? 'Sudah Checkout' : 'Checkout'}
+                            {checkoutSuccessful ? 'Sudah Absen Keluar' : 'Absen Keluar'}
                         </button>
                     </div>
                 </div>
@@ -375,7 +351,7 @@ const Header = () => {
                                     handleCheckout();
                                 }}
                             >
-                                Checkout
+                                Absen Keluar
                             </button>
                         </div>
                     </div>

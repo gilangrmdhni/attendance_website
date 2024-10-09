@@ -29,22 +29,22 @@ const ProfileSection = ({ title, items }: { title: string; items: any[] }) => {
       handleLogoutClick();
     } else {
       switch (item.name) {
-        case 'Personal Information':
+        case 'Informasi Pribadi':
           router.push('/personal-information');
           break;
-        case 'Employee List':
+        case 'Daftar Karyawan':
           router.push('/employees');
           break;
-        case 'Privacy Policy':
+        case 'Kebijakan Privasi':
           router.push('/PrivacyPolicyPage');
           break;
-        case 'Terms & Condition':
+        case 'Syarat & Ketentuan':
           router.push('/TermsConditionsPage');
           break;
-        case 'Change Password':
+        case 'Ubah Kata Sandi':
           router.push('/ChangePassword');
           break;
-        case 'Notification':
+        case 'Notifikasi':
           router.push('/Notifications');
           break;
         default:

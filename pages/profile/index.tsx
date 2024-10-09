@@ -5,18 +5,18 @@ import ProfileHeader from '../../components/profile/ProfileHeader';
 import ProfileSection from '../../components/profile/ProfileSection';
 
 const generalInformationItems = [
-  { name: "Employee List" },
-  { name: "Personal Information" },
+  { name: "Daftar Karyawan" },
+  { name: "Informasi Pribadi" },
 ];
 
 const settingItems = [
-  { name: "Change Password" },
-  { name: "Notification" },
+  { name: "Ubah Kata Sandi" },
+  { name: "Notifikasi" },
 ];
 
 const aboutItems = [
-  { name: "Privacy Policy" },
-  { name: "Terms & Condition" },
+  { name: "Kebijakan Privasi" },
+  { name: "Syarat & Ketentuan" },
 ];
 
 const logoutItem = [
@@ -33,9 +33,9 @@ const Profile = () => {
       <ProfileHeader />
       <main className="px-4 py-4">
         <div className='mb-20'>
-          <ProfileSection title="General Information" items={generalInformationItems} />
-          <ProfileSection title="Setting" items={settingItems} />
-          <ProfileSection title="About" items={aboutItems} />
+          <ProfileSection title="Informasi Umum" items={generalInformationItems} />
+          <ProfileSection title="Pengaturan" items={settingItems} />
+          <ProfileSection title="Tentang" items={aboutItems} />
           <ProfileSection title="" items={logoutItem} />
         </div>
       </main>

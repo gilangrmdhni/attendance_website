@@ -78,7 +78,7 @@ const EmployeesPage = () => {
                     <button onClick={() => router.back()} className='mr-4'>
                         <ArrowLeftIcon className="w-6 h-6" />
                     </button>
-                    <h1 className='text-2xl font-bold'>Employee List</h1>
+                    <h1 className='text-2xl font-bold'>Daftar Karyawan</h1>
                 </div>
                 <div className="relative mt-2">
                     <input

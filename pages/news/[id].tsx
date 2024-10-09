@@ -57,7 +57,7 @@ const NewsDetail: React.FC = () => {
           >
             <ArrowLeftIcon className="w-6 h-6" />
           </button>
-          <h1 className="ml-4 text-xl font-semibold">Announcement Details</h1>
+          <h1 className="ml-4 text-xl font-semibold">Detail Pengumuman</h1>
         </div>
       </header>
       <div className="bg-white p-4 max-w-screen-sm rounded-xl shadow-md mx-4 -mt-40 mb-8 z-10 relative">

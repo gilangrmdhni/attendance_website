@@ -57,7 +57,7 @@ const NotificationHeader = ({
                 >
                     <ArrowLeftIcon className="w-6 h-6" />
                 </button>
-                <h1 className="ml-4 text-xl font-semibold">Notification</h1>
+                <h1 className="ml-4 text-xl font-semibold">Notifikasi</h1>
             </div>
             <div className="flex items-center mt-4">
                 <input
