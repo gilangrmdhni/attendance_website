@@ -8,11 +8,14 @@ import router from 'next/router';
 import axios from 'axios';
 import { fetchLeaveAllowance, submitTimeOffRequest } from '@/store/slices/timeOffSlice';
 import { submitOvertimeRequest } from '@/store/slices/overtimeSlice';
+import { AiOutlineWarning } from 'react-icons/ai';
+
+
 
 type DynamicFormField = {
   name: string;
   label: string;
-  type: 'text' | 'number' | 'email' | 'password' | 'textarea' | 'file' | 'date' | 'select';
+  type: 'text' | 'number' | 'email' | 'password' | 'textarea' | 'file' | 'date' | 'select' | 'time';
 };
 
 type DynamicFormProps = {
@@ -25,8 +28,8 @@ type DynamicFormProps = {
 const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description, fields, onSubmit }) => {
   const dispatch = useDispatch<AppDispatch>();
   const formRef = useRef<HTMLFormElement>(null);
-  const { categories, categoriesStatus } = useSelector((state: RootState) => state.permission); // Mengambil state kategori izin
-  const leaveAllowance = useSelector((state: RootState) => state.timeOff.leaveAllowance); // Mengambil total cuti
+  const { categories, categoriesStatus } = useSelector((state: RootState) => state.permission);
+  const leaveAllowance = useSelector((state: RootState) => state.timeOff.leaveAllowance);
 
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
@@ -209,7 +212,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                       onChange={handleFileChange}
                     />
                     <label htmlFor={field.name} className="block text-sm font-medium text-blue-500 cursor-pointer">
-                      Upload Bukti foto untuk mengajukan
+                      Upload Lampiran untuk mengajukan
                     </label>
                     <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
                       Tambahkan bukti untuk mengkonfirmasi
@@ -238,6 +241,13 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                       </option>
                     ))}
                   </select>
+                ) : field.type === 'time' ? (
+                  <input
+                    id={field.name}
+                    type="time"
+                    name={field.name}
+                    className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                  />
                 ) : field.type === 'number' ? (
                   <input
                     id={field.name}
@@ -283,8 +293,11 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         {/* Menampilkan total cuti */}
         <div className='pt-4 flex justify-center'>
           {title.includes('Cuti Form') && leaveAllowance !== null && (
-            <div className='w-full bg-primary-blue border border-gray-300 rounded-lg p-3 text-center'>
-              <h2>Total Cuti Anda : {leaveAllowance} Hari</h2>
+            <div className='w-full rounded-lg p-2 text-center flex items-center justify-center'>
+              <AiOutlineWarning className='mr-2 text-black' /> {/* Ikon di sebelah kiri */}
+              <h2 className='text-black'>
+                Total Cuti Anda: {leaveAllowance} Hari
+              </h2>
             </div>
           )}
         </div>

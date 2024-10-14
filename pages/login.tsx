@@ -62,7 +62,7 @@ const Login = () => {
                     {/* Header */}
                     <div className="relative bg-orange-500" style={{ height: '450px' }}>
                         {/* Logo di kanan atas */}
-                        <div className="absolute top-4 right-4">
+                        <div className="absolute top-2 right-2">
                             <img src="/icons/logoNUN.png" alt="Logo" className="w-20 h-20 object-contain" />
                         </div>
 
@@ -78,10 +78,10 @@ const Login = () => {
                     {/* Form */}
                     <div className="p-6 py-10">
                         <p className="text-gray-700 text-sm mb-1">{greeting}</p>
-                        <h1 className="text-xl font-semibold mb-4">Welcome Back, Login to Continue your activity!</h1>
+                        <h1 className="text-xl font-semibold mb-4">Selamat Datang Kembali, Masuk untuk Melanjutkan aktivitas Anda!</h1>
                         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-                        <label htmlFor="identifier" className="block text-gray-600 font-medium mb-1">Email or Username</label>
+                        <label htmlFor="identifier" className="block text-gray-600 font-medium mb-1">Email atau Username</label>
                         <input
                             id="identifier"
                             type="text"

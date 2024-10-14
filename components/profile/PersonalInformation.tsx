@@ -12,23 +12,16 @@ const PersonalInformation = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user, loading, error } = useSelector((state: RootState) => state.user);
     const router = useRouter();
-
-    // Local state for form fields
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-
-    // Local state for edit mode
     const [isEditing, setIsEditing] = useState(false);
-
-    // Backup original values to restore on cancel
     const [originalName, setOriginalName] = useState('');
     const [originalEmail, setOriginalEmail] = useState('');
     const [originalPhoneNumber, setOriginalPhoneNumber] = useState('');
-
-    // Local state for error message
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false); 
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     useEffect(() => {
@@ -40,8 +33,6 @@ const PersonalInformation = () => {
             setName(user.full_name || '');
             setEmail(user.email || '');
             setPhoneNumber(user.phone_number || '');
-
-            // Set original values to enable cancel functionality
             setOriginalName(user.full_name || '');
             setOriginalEmail(user.email || '');
             setOriginalPhoneNumber(user.phone_number || '');
@@ -63,35 +54,33 @@ const PersonalInformation = () => {
             : '/icons/userEdit.png';
 
     const handleSave = () => {
-        setIsModalOpen(true); // Tampilkan modal konfirmasi saat tombol Save diklik
+        setIsModalOpen(true); 
     };
 
     const confirmSave = async () => {
         const profileData = {
             full_name: name,
             email: email,
+            username: username,
             phone_number: phoneNumber,
         };
 
         try {
             await dispatch(updateUserProfile(profileData)).unwrap();
-            setIsEditing(false); // Kembali ke mode tampilan setelah berhasil menyimpan
-            setErrorMessage(null); // Reset error message on success
-            setIsModalOpen(false); // Tutup modal jika terbuka
+            setIsEditing(false);
+            setErrorMessage(null);
+            setIsModalOpen(false);
 
-            // Fetch user data again to get the updated information
             await dispatch(fetchUser());
 
-            // Notify the user of successful update
             toast.success('Profile updated successfully!');
         } catch (error: any) {
-            // Set error message based on the response from the API
             if (error.code === 400 && error.error) {
-                setErrorMessage(Object.values(error.error).join(', ')); // Join multiple error messages
+                setErrorMessage(Object.values(error.error).join(', '));
             } else {
-                setErrorMessage('Failed to save profile. Please try again.'); // Fallback error message
+                setErrorMessage('Failed to save profile. Please try again.');
             }
-            setIsModalOpen(true); // Open modal on error
+            setIsModalOpen(true);
         }
     };
 
@@ -169,6 +158,17 @@ const PersonalInformation = () => {
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            disabled={!isEditing}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-500 text-sm mb-2" htmlFor="email">Username</label>
+                        <input
+                            type="username"
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             disabled={!isEditing}
                             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-blue"
                         />

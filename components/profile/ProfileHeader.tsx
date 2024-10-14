@@ -5,21 +5,24 @@ import Image from 'next/image';
 import { AppDispatch, RootState } from '../../store/store';
 import ProfilePopup from './ProfilePopup';
 import { fetchUser, updateUserPicture } from '../../store/slices/userSlice';
-
+import { fetchLeaveAllowance } from '@/store/slices/timeOffSlice';
 
 const ProfileHeader = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);  // To check client-side mounting
+  const [isMounted, setIsMounted] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { user, error } = useSelector((state: RootState) => state.user); // Removed `loading`
+  const { user, error } = useSelector((state: RootState) => state.user);
   const { token } = useSelector((state: RootState) => state.auth);
   const [profilePictureUrl, setProfilePictureUrl] = useState('/icons/userEdit.png');
+  const leaveAllowance = useSelector((state: RootState) => state.timeOff.leaveAllowance);
+
 
   useEffect(() => {
     if (token) {
       dispatch(fetchUser());
     }
+    dispatch(fetchLeaveAllowance());
   }, [dispatch, token]);
 
   useEffect(() => {
@@ -32,7 +35,7 @@ const ProfileHeader = () => {
       setProfilePictureUrl(`https://api.attendance.nuncorp.id${user.picture}?timestamp=${Date.now()}`);
     }
   }, [user]);
-  
+
 
   const togglePopup = () => {
     setIsPopupVisible(!isPopupVisible);
@@ -56,7 +59,7 @@ const ProfileHeader = () => {
       setIsPopupVisible(false);
     }
   };
-  
+
   const handleLoginRedirect = () => {
     if (!token) {
       router.push('/login');
@@ -104,6 +107,9 @@ const ProfileHeader = () => {
           </p>
           <p className="text-sm text-gray-400">
             {user?.position ? String(user.position) : 'N/A'}
+          </p>
+          <p className="text-sm text-gray-400">
+            Total Cuti Anda: {leaveAllowance} Hari
           </p>
         </div>
       </div>

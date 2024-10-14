@@ -12,15 +12,16 @@ const formConfigurations: Record<string, FormConfig> = {
         fields: [
             { type: 'date', label: 'Tanggal', name: 'dates' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
-            { type: 'file', label: 'Tambahkan Foto', name: 'attachment' }
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
     overtime: {
         title: 'Lembur Form',
         fields: [
             { type: 'date', label: 'Tanggal', name: 'dates' },
-            { type: 'number', label: 'Jumlah Jam', name: 'overtime_hours' },
-            { type: 'textarea', label: 'Keterangan', name: 'description' }
+            { type: 'time', label: 'Jumlah Jam', name: 'overtime_hours' },
+            { type: 'textarea', label: 'Keterangan', name: 'description' },
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
     reimbursement: {
@@ -31,7 +32,7 @@ const formConfigurations: Record<string, FormConfig> = {
             { type: 'text', label: 'Dinas Perjalanan', name: 'trip' },
             { type: 'number', label: 'Nominal Pemakaian', name: 'amount' },
             { type: 'text', label: 'Rekening Penerima', name: 'account' },
-            { type: 'file', label: 'Tambahkan Foto', name: 'attachment' }
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
     permission: {
@@ -40,7 +41,7 @@ const formConfigurations: Record<string, FormConfig> = {
             { type: 'select', label: 'Kategori', name: 'category_permission_id' },
             { type: 'date', label: 'Tanggal', name: 'dates' },
             { type: 'textarea', label: 'Deskripsi', name: 'description' },
-            { type: 'file', label: 'Attachment', name: 'attachment' }
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
 };

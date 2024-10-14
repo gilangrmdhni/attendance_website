@@ -64,13 +64,13 @@ const ApprovalItem = () => {
                                         className="bg-white border-2 border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-white"
                                         onClick={() => handleReject(request.request_id)}
                                     >
-                                        Reject
+                                        Menolak
                                     </button>
                                     <button
                                         className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600"
                                         onClick={() => handleApproval(request.request_id, true)}
                                     >
-                                        Approve
+                                        Menyetujui
                                     </button>
                                 </div>
                             )}
@@ -84,7 +84,7 @@ const ApprovalItem = () => {
             {isPopupOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
                     <div className="bg-white p-5 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4">Reject Request</h3>
+                        <h3 className="text-lg font-semibold mb-4">Izin</h3>
                         <textarea
                             className="w-full p-2 border border-gray-300 rounded"
                             placeholder="Masukkan pesan penolakan..."
@@ -93,10 +93,10 @@ const ApprovalItem = () => {
                         />
                         <div className="mt-4 flex justify-end">
                             <button className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={handlePopupClose}>
-                                Cancel
+                                Kembali
                             </button>
                             <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={confirmReject}>
-                                Confirm Reject
+                                Kinfirmasi menolak
                             </button>
                         </div>
                     </div>
