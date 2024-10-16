@@ -1,36 +1,33 @@
-const TimeOffItem = ({ type, reason, date, duration }: any) => {
-    // Menentukan ikon dan nama berdasarkan tipe
+const TimeOffItem = ({ type, reason, date, submission, category }: any) => {
+    // Menentukan ikon berdasarkan status
     let icon;
-    let typeName;
+    let statusLabel;
 
-    switch (type) {
-        case "Sick":
-            icon = "/icons/sick.png";
-            typeName = "Izin Sakit";
+    switch (submission) {
+        case "approved":
+            icon = "/icons/clipboardText.png";
+            statusLabel = "Disetujui";
             break;
-        case "Leave":
-            icon = "/icons/sick.png"; // Ganti dengan ikon yang sesuai untuk Izin
-            typeName = "Izin Cuti";
+        case "waiting":
+            icon = "/icons/clipboardDefault.png";
+            statusLabel = "Menunggu Persetujuan";
             break;
-        case "Reimbursement":
-            icon = "/icons/sick.png"; // Ganti dengan ikon yang sesuai untuk Reimbursment
-            typeName = "Reimbursment";
-            break;
-        case "Overtime":
-            icon = "/icons/sick.png"; // Ganti dengan ikon yang sesuai untuk Lembur
-            typeName = "Lembur";
+        case "rejected":
+            icon = "/icons/clipboardDefault.png";
+            statusLabel = "Ditolak";
             break;
         default:
-            icon = "/icons/sick.png"; // Ikon default untuk kategori yang tidak terdaftar
-            typeName = "Other"; // Nama default
+            icon = "/icons/lembur.png";
+            statusLabel = "Status Tidak Diketahui";
     }
 
     return (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center">
-            <img src={icon} alt={typeName} className="w-10 h-10 mr-4" />
+            <img src={icon} alt={statusLabel} className="w-10 h-10 mr-4" />
             <div className="flex-1">
-                <p className="text-gray-400 text-sm">{typeName}</p>
-                <p className="text-sm">{reason}</p>
+                <p className="text-xs text-gray-400">{statusLabel}</p>
+                <p className="text-md">{category}</p>
+                <p className="text-sm text-gray-500">{reason}</p>
                 <p className="text-gray-400 text-xs mt-2">{date}</p>
             </div>
         </div>

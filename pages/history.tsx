@@ -127,13 +127,29 @@ const History = () => {
                     type = 'Lainnya';
                 }
 
+                let status;
+                switch (item.status) {
+                  case 'approved':
+                    status = 'Disetujui';
+                    break;
+                  case 'waiting':
+                    status = 'Menunggu Persetujuan';
+                    break;
+                  case 'rejected':
+                    status = 'Ditolak';
+                    break;
+                  default:
+                    status = 'Status Tidak Diketahui';
+                }
+
                 return (
                   <TimeOffItem
                     key={item.id}
                     type={type}
+                    category={item.category}
                     reason={item.description}
                     date={new Date(item.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                    duration={item.status === 'approved' ? 'Full Day' : 'Pending'}
+                    submission={item.status}
                   />
                 );
               })
