@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from '../../store/store';
 import SuccessModal from '../../components/SuccessModal'; // Import the SuccessModal component
 import ErrorModal from '../../components/ErrorModal'; // Import the ErrorModal component
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 
 const Map = dynamic(() => import('../../utils/Map'), { ssr: false });
@@ -20,10 +21,34 @@ const ScanContent = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { status, error } = useSelector((state: RootState) => state.checkin);
     const [isCheckedIn, setIsCheckedIn] = useState(false);
+    const [isWFHApproved, setIsWFHApproved] = useState(false); // State untuk menyimpan status approval WFH
     const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false); // State for success modal
     const [isErrorModalVisible, setIsErrorModalVisible] = useState(false); // State for error modal
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const router = useRouter(); // Inisialisasi router
+
+    useEffect(() => {
+        // Mendapatkan status approval WFH dari API
+        const fetchWFHApprovalStatus = async () => {
+            try {
+                const response = await axios.get('https://api.attendance.nuncorp.id/api/request-approval/history?page=1&limit=10');
+                const approvals = response.data.body;
+
+                // Filter untuk izin WFH terbaru
+                const latestWFH = approvals.find((item: any) => item.permission === 'WFH' && item.category === 'Izin');
+
+                if (latestWFH) {
+                    setIsWFHApproved(latestWFH.status === 'approved');
+                } else {
+                    setIsWFHApproved(false);
+                }
+            } catch (error) {
+                console.error('Error fetching approval status:', error);
+            }
+        };
+
+        fetchWFHApprovalStatus();
+    }, []);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -204,7 +229,16 @@ const ScanContent = () => {
                                 </div>
                                 <FiArrowRight className="ml-auto text-gray-500" />
                             </div>
-                            <div onClick={() => handleOptionSelect('WFA/WFH')} className="p-4 bg-gray-100 rounded-lg flex items-center cursor-pointer">
+                            <div
+                                onClick={() => {
+                                    if (isWFHApproved) {
+                                        handleOptionSelect('WFA/WFH');
+                                    } else {
+                                        alert('Izin WFH belum disetujui. Silakan tunggu hingga disetujui untuk dapat melakukan absen WFA/WFH.');
+                                    }
+                                }}
+                                className={`p-4 bg-gray-100 rounded-lg flex items-center cursor-pointer ${isWFHApproved ? '' : 'opacity-50 cursor-not-allowed'}`}
+                            >
                                 <img src="/images/wfh.png" alt="Home Icon" className="w-10 h-10 mr-4" />
                                 <div>
                                     <p className="font-semibold">Absen WFA/WFH</p>
@@ -217,6 +251,7 @@ const ScanContent = () => {
                     </div>
                 </div>
             )}
+
 
             {/* Success Modal */}
             <SuccessModal

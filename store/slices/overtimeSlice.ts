@@ -6,6 +6,7 @@ interface OvertimeRequest {
     description: string;
     dates: string;
     overtime_hours: number;
+    attachment: File;
 }
 
 export const submitOvertimeRequest = createAsyncThunk(
@@ -15,6 +16,7 @@ export const submitOvertimeRequest = createAsyncThunk(
         form.append('description', formData.description);
         form.append('dates', formData.dates);
         form.append('overtime_hours', formData.overtime_hours.toString());
+        form.append('attachment', formData.attachment);
         const response = await axiosInstance.post('/request/overtime', form);
         return response.data;
     }

@@ -1,5 +1,5 @@
 // formTypes.ts
-export type FieldType = 'text'| 'number' | 'email' | 'password' | 'textarea' | 'date' | 'file' | 'select' | 'time';
+export type FieldType = 'text'| 'number' | 'email' | 'password' | 'textarea' | 'date' | 'file' | 'select' | 'time' |'overtime';
 
 export interface Field {
     type: FieldType;

@@ -11,11 +11,10 @@ import { submitOvertimeRequest } from '@/store/slices/overtimeSlice';
 import { AiOutlineWarning } from 'react-icons/ai';
 
 
-
 type DynamicFormField = {
   name: string;
   label: string;
-  type: 'text' | 'number' | 'email' | 'password' | 'textarea' | 'file' | 'date' | 'select' | 'time';
+  type: 'text' | 'number' | 'email' | 'password' | 'textarea' | 'file' | 'date' | 'select' | 'time' | 'overtime';
 };
 
 type DynamicFormProps = {
@@ -255,6 +254,14 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                     name={field.name}
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                     placeholder={"IDR 0"}
+                  />
+                ) : field.type === 'overtime' ? (
+                  <input
+                    id={field.name}
+                    type="number"
+                    name={field.name}
+                    className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                    placeholder={"0"}
                   />
                 ) : (
                   <div className="relative">

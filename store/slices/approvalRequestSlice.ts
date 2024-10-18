@@ -8,13 +8,14 @@ interface ApprovalRequest {
     full_name: string;
     position: string;
     status: string;
+    category: string;
 }
 
 
 interface UpdateApprovalStatusPayload {
     request_id: number;
     status: boolean;
-    message?: string; // Buat message opsional
+    message?: string;
 }
 
 // Async thunk untuk mengambil data request approval
@@ -34,17 +35,21 @@ export const updateApprovalStatus = createAsyncThunk(
     'approval/updateStatus',
     async ({ request_id, status, message }: UpdateApprovalStatusPayload, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put(`/request-approval/update`, {
-                request_id,
-                status,
-                message, // Sertakan message di sini
+            const response = await axiosInstance.put(`/request-approval/update`, null, {
+                params: {
+                    request_id,
+                    status: status.toString(),
+                    message,
+                },
             });
+
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response.data);
         }
     }
 );
+
 
 const initialState = {
     requests: [] as ApprovalRequest[],
