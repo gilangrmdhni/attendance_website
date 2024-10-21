@@ -261,9 +261,17 @@ const Header = () => {
                     </div>
 
                     {/* Right Column */}
-                    {user?.position && allowedPositions.includes(String(user.position)) && (
-                        <img src="/icons/manager.png" alt="User Icon" className="w-6 h-6" onClick={handleIconClick} />
-                    )}
+                    <div className="flex items-center space-x-2">
+                        {user?.position && allowedPositions.includes(String(user.position)) && (
+                            <img src="/icons/manager.png" alt="User Icon" className="w-6 h-6" onClick={handleIconClick} />
+                        )}
+                        <img
+                            src="/icons/notification.png"
+                            alt="Notification Icon"
+                            className="w-6 h-6 cursor-pointer"
+                            onClick={() => router.push('/Notifications')}
+                        />
+                    </div>
                 </div>
 
                 <div className="absolute justify-center right-4 top-full mt-[-70px] w-full max-w-[350px]">

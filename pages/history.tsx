@@ -10,9 +10,11 @@ import MobileContainer from '../components/MobileContainer';
 import HistoryHeader from '../components/history/HistoryHeader';
 import { HistoryItem as HistoryItemType, RequestApproval as RequestApprovalType } from '../store/types/historyTypes';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 const History = () => {
   const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
   const history = useSelector((state: RootState) => state.history.history);
   const historyStatus = useSelector((state: RootState) => state.history.status);
   const requests = useSelector((state: RootState) => state.requestApproval.requests);
@@ -26,22 +28,27 @@ const History = () => {
 
 
   useEffect(() => {
-    if (historyStatus === 'idle') {
+    // Fetch data berdasarkan status saat pertama kali komponen dimuat
+    if (historyStatus === 'idle' && activeTab === 'Attendance') {
       dispatch(fetchHistory());
     }
-    if (requestsStatus === 'idle') {
+    if (requestsStatus === 'idle' && activeTab === 'Time Off') {
       dispatch(fetchRequestApprovals());
     }
-  }, [dispatch, historyStatus, requestsStatus]);
-
+  }, [dispatch, historyStatus, requestsStatus, activeTab]);
+  
+  // Refetch ketika activeTab berubah
   useEffect(() => {
-    if (activeTab === 'Attendance' && historyStatus === 'idle') {
-      dispatch(fetchHistory());
-    } else if (activeTab === 'Time Off' && requestsStatus === 'idle') {
-      dispatch(fetchRequestApprovals());
+    if (activeTab === 'Attendance') {
+      if (historyStatus !== 'loading') {
+        dispatch(fetchHistory());
+      }
+    } else if (activeTab === 'Time Off') {
+      if (requestsStatus !== 'loading') {
+        dispatch(fetchRequestApprovals());
+      }
     }
-  }, [dispatch, activeTab, historyStatus, requestsStatus]);
-
+  }, [dispatch, activeTab, historyStatus, requestsStatus]);  
 
   const filteredHistory = (history ?? []).filter((item: HistoryItemType) => {
     const matchesSearch = item.tipe.toLowerCase().includes(searchTerm.toLowerCase()) ||

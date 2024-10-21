@@ -65,17 +65,16 @@ const News: React.FC = () => {
   }
 
   return (
-    <MobileContainer>
-      <section className="bg-white p-4 rounded-lg shadow-md max-w-screen-md mx-auto">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">Pengumuman</h2>
-          {/* <a href="#" className="text-primary-blue text-xs">See All</a> */}
-        </div>
-        <div className="space-y-4">
-          {content}
-        </div>
-      </section>
-    </MobileContainer>
+    <section className="bg-white p-4 rounded-lg shadow-md max-w-screen-md mx-auto">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">Pengumuman</h2>
+        {/* <a href="#" className="text-primary-blue text-xs">See All</a> */}
+      </div>
+      <div className="space-y-4">
+        {content}
+      </div>
+
+    </section>
   );
 };
 
