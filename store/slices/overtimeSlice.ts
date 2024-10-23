@@ -4,8 +4,9 @@ import axiosInstance from '../../utils/axiosInstance';
 
 interface OvertimeRequest {
     description: string;
-    dates: string;
-    overtime_hours: number;
+    start_date: string;
+    start_hours: number;
+    end_hours: number;
     attachment: File;
 }
 
@@ -14,8 +15,9 @@ export const submitOvertimeRequest = createAsyncThunk(
     async (formData: OvertimeRequest, { rejectWithValue }) => {
         const form = new FormData();
         form.append('description', formData.description);
-        form.append('dates', formData.dates);
-        form.append('overtime_hours', formData.overtime_hours.toString());
+        form.append('start_date', formData.start_date);
+        form.append('start_hours', formData.start_hours.toString());
+        form.append('end_hours', formData.end_hours.toString());
         form.append('attachment', formData.attachment);
         const response = await axiosInstance.post('/request/overtime', form);
         return response.data;

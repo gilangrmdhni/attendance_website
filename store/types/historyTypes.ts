@@ -15,6 +15,7 @@ export interface HistoryItem {
     category: string; // Kategori, misalnya "Reimbursment" atau "TimeOff"
     description: string; // Deskripsi permintaan
     dates: string; // Tanggal dalam format ISO 8601
+    start_date: string; // Tanggal dalam format ISO 8601
     status: string; // Status permintaan, misalnya "approved" atau "waiting"
   }
   

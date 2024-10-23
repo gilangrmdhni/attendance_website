@@ -106,6 +106,15 @@ const NotificationsComponent: React.FC = () => {
                             </p>
                         )}
 
+                        {notification.start_date && (
+                            <p className="text-sm text-gray-500">
+                                Mulai : {new Date(notification.start_date).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                })}{' '}
+                            </p>
+                        )}
                         {notification.checkintime && (
                             <p className="text-sm text-gray-500">
                                 Check-in Time: {new Date(notification.checkintime).toLocaleTimeString('id-ID')}

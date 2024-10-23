@@ -6,6 +6,7 @@ interface Notification {
   title: string;
   description: string;
   checkintime?: string;
+  start_date?: string;
   status?: string;
   dates?: string;
   created_at: string;

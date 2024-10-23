@@ -39,14 +39,10 @@ const History = () => {
   
   // Refetch ketika activeTab berubah
   useEffect(() => {
-    if (activeTab === 'Attendance') {
-      if (historyStatus !== 'loading') {
-        dispatch(fetchHistory());
-      }
-    } else if (activeTab === 'Time Off') {
-      if (requestsStatus !== 'loading') {
-        dispatch(fetchRequestApprovals());
-      }
+    if (activeTab === 'Attendance' && historyStatus === 'idle') {
+      dispatch(fetchHistory());
+    } else if (activeTab === 'Time Off' && requestsStatus === 'idle') {
+      dispatch(fetchRequestApprovals());
     }
   }, [dispatch, activeTab, historyStatus, requestsStatus]);  
 
@@ -155,7 +151,7 @@ const History = () => {
                     type={type}
                     category={item.category}
                     reason={item.description}
-                    date={new Date(item.dates).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    start_date={new Date(item.start_date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                     submission={item.status}
                   />
                 );

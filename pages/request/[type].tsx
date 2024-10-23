@@ -18,8 +18,9 @@ const formConfigurations: Record<string, FormConfig> = {
     overtime: {
         title: 'Lembur Form',
         fields: [
-            { type: 'date', label: 'Tanggal', name: 'dates' },
-            { type: 'overtime', label: 'Jumlah Jam', name: 'overtime_hours' },
+            { type: 'date', label: 'Mulai', name: 'start_date' },
+            { type: 'time', label: 'Jam Mulai', name: 'start_hours' },
+            { type: 'time', label: 'Jam Selesai', name: 'end_hours' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
             { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],

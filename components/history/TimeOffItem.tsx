@@ -1,4 +1,4 @@
-const TimeOffItem = ({ type, reason, date, submission, category }: any) => {
+const TimeOffItem = ({ type, reason, start_date, submission, category }: any) => {
     // Menentukan ikon berdasarkan status
     let icon;
     let statusLabel;
@@ -28,7 +28,7 @@ const TimeOffItem = ({ type, reason, date, submission, category }: any) => {
                 <p className="text-xs text-gray-400">{statusLabel}</p>
                 <p className="text-md">{category}</p>
                 <p className="text-sm text-gray-500">{reason}</p>
-                <p className="text-gray-400 text-xs mt-2">{date}</p>
+                <p className="text-gray-400 text-xs mt-2">Mulai :{start_date}</p>
             </div>
         </div>
     );
