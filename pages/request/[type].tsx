@@ -10,7 +10,8 @@ const formConfigurations: Record<string, FormConfig> = {
     timeoff: {
         title: 'Cuti Form',
         fields: [
-            { type: 'date', label: 'Tanggal', name: 'dates' },
+            { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
+            { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
             { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
@@ -18,7 +19,7 @@ const formConfigurations: Record<string, FormConfig> = {
     overtime: {
         title: 'Lembur Form',
         fields: [
-            { type: 'date', label: 'Mulai', name: 'start_date' },
+            { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
             { type: 'time', label: 'Jam Mulai', name: 'start_hours' },
             { type: 'time', label: 'Jam Selesai', name: 'end_hours' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
@@ -30,9 +31,8 @@ const formConfigurations: Record<string, FormConfig> = {
         fields: [
             { type: 'date', label: 'Tanggal', name: 'dates' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
-            { type: 'text', label: 'Dinas Perjalanan', name: 'trip' },
+            { type: 'text', label: 'Perjalan Dinas', name: 'trip' },
             { type: 'number', label: 'Nominal Pemakaian', name: 'amount' },
-            { type: 'text', label: 'Rekening Penerima', name: 'account' },
             { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
@@ -40,13 +40,21 @@ const formConfigurations: Record<string, FormConfig> = {
         title: 'Izin Form',
         fields: [
             { type: 'select', label: 'Kategori', name: 'category_permission_id' },
-            { type: 'date', label: 'Tanggal', name: 'dates' },
+            { type: 'date', label: 'Tanggal', name: 'start_date' },
             { type: 'textarea', label: 'Deskripsi', name: 'description' },
             { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
+    attendance: { 
+        title: 'Pembaruan Kehadiran Form',
+        fields: [
+            { type: 'textarea', label: 'Keterangan', name: 'description' },
+            { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
+            { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
+        ],
+    },
 };
-
 
 const RequestForm = () => {
     const router = useRouter();

@@ -9,6 +9,7 @@ import axios from 'axios';
 import { fetchLeaveAllowance, submitTimeOffRequest } from '@/store/slices/timeOffSlice';
 import { submitOvertimeRequest } from '@/store/slices/overtimeSlice';
 import { AiOutlineWarning } from 'react-icons/ai';
+import { submitAttendanceUpdateRequest } from '@/store/slices/attendanceCorrectionSlice';
 
 
 type DynamicFormField = {
@@ -76,6 +77,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     const requiredFields = fields.filter(f => f.type !== 'file');
     for (const field of requiredFields) {
       if (!formData.get(field.name)) {
+        console.log(`Field ${field.name} is required`);
         return false;
       }
     }
@@ -109,7 +111,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
 
     const formattedData = {
       ...formObject,
-      category_permission_id: isNaN(categoryPermissionId) ? 0 : categoryPermissionId, // Jika tidak valid, kirim 0
+      category_permission_id: isNaN(categoryPermissionId) ? 0 : categoryPermissionId,
       attachment: formData.get('attachment') as File,
     };
 
@@ -127,8 +129,10 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         response = await dispatch(submitTimeOffRequest(formattedData as any));
       } else if (title.includes('Lembur')) {
         response = await dispatch(submitOvertimeRequest(formattedData as any));
+      } else if (title.includes('Attendance')) { 
+        response = await dispatch(submitAttendanceUpdateRequest(formattedData as any));
       }
-
+      
       // Cek jika response ada dan mengandung error
       if (response && response.payload && 'error' in response.payload) {
         throw new Error(response.payload.error.message || 'Failed to submit data');
@@ -154,7 +158,6 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
       setSnackbarType('error');
       setSnackbarVisible(true);
     } finally {
-      // Pastikan snackbar terlihat setelah proses selesai
       if (snackbarVisible) {
         setSnackbarVisible(true);
       }

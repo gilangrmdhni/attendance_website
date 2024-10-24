@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosInstance';
 
-interface TimeOffRequest {
+interface AttendanceUpdateRequest {
     description: string;
     start_date: string;
     end_date: string;
@@ -12,18 +12,18 @@ interface LeaveAllowanceState {
     leaveAllowance: number | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
-    data: any; // Ganti dengan tipe yang lebih spesifik jika memungkinkan
+    data: any; 
 }
 
-export const submitTimeOffRequest = createAsyncThunk(
-    'timeoff/submitRequest',
-    async (formData: TimeOffRequest, { rejectWithValue }) => {
+export const submitAttendanceUpdateRequest = createAsyncThunk(
+    'attendanceupdate/submitRequest',
+    async (formData: AttendanceUpdateRequest, { rejectWithValue }) => {
         const form = new FormData();
         form.append('description', formData.description);
         form.append('start_date', formData.start_date);
         form.append('end_date', formData.end_date);
         form.append('attachment', formData.attachment);
-        const response = await axiosInstance.post('/request/time-off', form);
+        const response = await axiosInstance.post('/request/attendance-update', form);
         return response.data;
     }
 );
@@ -49,15 +49,15 @@ const timeOffSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(submitTimeOffRequest.pending, (state) => {
+            .addCase(submitAttendanceUpdateRequest.pending, (state) => {
                 state.status = 'loading';
                 state.error = null;
             })
-            .addCase(submitTimeOffRequest.fulfilled, (state, action) => {
+            .addCase(submitAttendanceUpdateRequest.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.data = action.payload;
             })
-            .addCase(submitTimeOffRequest.rejected, (state, action) => {
+            .addCase(submitAttendanceUpdateRequest.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload as string;
             })

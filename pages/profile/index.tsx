@@ -35,7 +35,7 @@ const Profile = () => {
         <div className='mb-20'>
           <ProfileSection title="Informasi Umum" items={generalInformationItems} />
           <ProfileSection title="Pengaturan" items={settingItems} />
-          <ProfileSection title="Tentang" items={aboutItems} />
+          {/* <ProfileSection title="Tentang" items={aboutItems} /> */}
           <ProfileSection title="" items={logoutItem} />
         </div>
       </main>

@@ -35,7 +35,7 @@ const RequestHeader: React.FC = () => {
                             onClick={() => handleMenuClick('reimbursement')}
                         >
                             <img src="/icons/reimbursement.png" alt="Reimbursement" className="w-10 h-10 mb-2" />
-                            <span className="text-sm font-medium text-blue-800">Reimbursement</span>
+                            <span className="text-sm font-medium text-blue-800">  Reimbursement  </span>
                         </div>
                         <div
                             className="bg-white p-4 rounded-lg border-2 flex flex-col items-center cursor-pointer"
@@ -43,6 +43,13 @@ const RequestHeader: React.FC = () => {
                         >
                             <img src="/icons/izin.png" alt="permission" className="w-10 h-10 mb-2" />
                             <span className="text-sm font-medium text-blue-800">Izin</span>
+                        </div>
+                        <div
+                            className="bg-white p-4 rounded-lg border-2 flex flex-col items-center cursor-pointer"
+                            onClick={() => handleMenuClick('attendance')}
+                        >
+                            <img src="/icons/koreksi.png" alt="attendance" className="w-12 h-12 mb-2" />
+                            <span className="text-xs font-medium text-blue-800">Koreksi Absensi</span>
                         </div>
                     </div>
                 </div>

@@ -6,7 +6,7 @@ import axios, { AxiosError } from 'axios';
 interface PermissionRequest {
     category_permission_id: string;
     description: string;
-    dates: string; 
+    start_date: string;
     attachment: File;
 }
 
@@ -22,7 +22,7 @@ export const submitPermissionRequest = createAsyncThunk(
         const form = new FormData();
         form.append('category_permission_id', String(Number(formData.category_permission_id)));
         form.append('description', formData.description);
-        form.append('dates', formData.dates);
+        form.append('start_date', formData.start_date);
         form.append('attachment', formData.attachment);
         const response = await axiosInstance.post('/request/permission', form);
         return response.data;

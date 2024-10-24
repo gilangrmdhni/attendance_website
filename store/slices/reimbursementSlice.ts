@@ -4,7 +4,7 @@ import axiosInstance from '../../utils/axiosInstance';
 
 interface ReimbursementRequest {
     description: string;
-    dates: string; 
+    dates: string;
     account: string;
     amount: string;
     trip: string;
