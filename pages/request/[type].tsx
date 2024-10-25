@@ -20,6 +20,7 @@ const formConfigurations: Record<string, FormConfig> = {
         title: 'Lembur Form',
         fields: [
             { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
+            { type: 'date', label: 'Tanggal Mulai', name: 'end_date' },
             { type: 'time', label: 'Jam Mulai', name: 'start_hours' },
             { type: 'time', label: 'Jam Selesai', name: 'end_hours' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
@@ -29,11 +30,11 @@ const formConfigurations: Record<string, FormConfig> = {
     reimbursement: {
         title: 'Reimbursement Form',
         fields: [
-            { type: 'date', label: 'Tanggal', name: 'dates' },
+            { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
+            { type: 'date', label: 'Tanggal Akhir', name: 'end_date' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
-            { type: 'text', label: 'Perjalan Dinas', name: 'trip' },
-            { type: 'number', label: 'Nominal Pemakaian', name: 'amount' },
-            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
+            { type: 'text', label: 'Perjalanan Dinas', name: 'trip' },
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachments' } 
         ],
     },
     permission: {
@@ -41,17 +42,18 @@ const formConfigurations: Record<string, FormConfig> = {
         fields: [
             { type: 'select', label: 'Kategori', name: 'category_permission_id' },
             { type: 'date', label: 'Tanggal', name: 'start_date' },
+            { type: 'date', label: 'Tanggal', name: 'end_date' },
             { type: 'textarea', label: 'Deskripsi', name: 'description' },
             { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
-    attendance: { 
-        title: 'Pembaruan Kehadiran Form',
+    attendance_update: {
+        title: 'Attendance Update Form',
         fields: [
             { type: 'textarea', label: 'Keterangan', name: 'description' },
             { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
             { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
-            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachments' }
         ],
     },
 };

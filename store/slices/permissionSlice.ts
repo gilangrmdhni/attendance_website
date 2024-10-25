@@ -7,6 +7,7 @@ interface PermissionRequest {
     category_permission_id: string;
     description: string;
     start_date: string;
+    end_date: string;
     attachment: File;
 }
 
@@ -23,6 +24,7 @@ export const submitPermissionRequest = createAsyncThunk(
         form.append('category_permission_id', String(Number(formData.category_permission_id)));
         form.append('description', formData.description);
         form.append('start_date', formData.start_date);
+        form.append('end_date', formData.end_date);
         form.append('attachment', formData.attachment);
         const response = await axiosInstance.post('/request/permission', form);
         return response.data;

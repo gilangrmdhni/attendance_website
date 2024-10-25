@@ -2,27 +2,37 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosInstance';
 
+interface Attachment {
+    amount: number; // Menggunakan number untuk amount
+    attachment: File | null;  // Menggunakan File untuk attachment
+}
+
 interface ReimbursementRequest {
+    category_id: number; // Menambahkan category_id
+    start_date: string; // Tanggal mulai
+    end_date: string; // Tanggal akhir
     description: string;
-    dates: string;
-    account: string;
-    amount: string;
     trip: string;
-    attachment: File;
+    attachments: Attachment[]; // Menggunakan array untuk attachments
 }
 
 export const submitReimbursementRequest = createAsyncThunk(
     'reimbursement/submitRequest',
     async (formData: ReimbursementRequest, { rejectWithValue }) => {
         const form = new FormData();
+        form.append('category_id', formData.category_id.toString()); // Mengkonversi ke string
+        form.append('start_date', formData.start_date);
+        form.append('end_date', formData.end_date);
         form.append('description', formData.description);
-        form.append('dates', formData.dates);
-        form.append('account', formData.account);
-        form.append('amount', formData.amount);
         form.append('trip', formData.trip);
-        form.append('attachment', formData.attachment);
-        const response = await axiosInstance.post('/request/reimbursment', form);
+
+        formData.attachments.forEach((attachment, index) => {
+            form.append(`attachments[${index}][amount]`, attachment.amount.toString()); // Mengkonversi ke string
+            form.append(`attachments[${index}][attachment]`, attachment.attachment ?? '');
+        });
+        const response = await axiosInstance.post('/request/reimbursement', form);
         return response.data;
+
     }
 );
 

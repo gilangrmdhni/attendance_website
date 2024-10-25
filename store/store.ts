@@ -14,7 +14,7 @@ import permissionReducer from './slices/permissionSlice';
 import timeOffReducer from './slices/timeOffSlice';
 import notificationReducer from './slices/notificationSlice';
 import announcementDetailReducer from './slices/announcementDetailSlice';
-import attendanceUpdateReducer from './slices/attendanceCorrectionSlice';
+import attendanceUpdateReducer from './slices/attendanceUpdateSlice';
 import { useDispatch } from 'react-redux';
 
 const store = configureStore({
@@ -29,12 +29,12 @@ const store = configureStore({
     history: historyReducer,
     requestApproval: requestApprovalReducer,
     attendance: attendanceReducer,
-    attendanceUpdate: attendanceUpdateReducer,
     reimbursement: reimbursementReducer,
     permission: permissionReducer,
     timeOff: timeOffReducer,
     notifications: notificationReducer,
     approval: approvalReducer,
+    attendanceUpdate: attendanceUpdateReducer,
   },
 });
 

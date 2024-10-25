@@ -30,7 +30,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const formRef = useRef<HTMLFormElement>(null);
   const { categories, categoriesStatus } = useSelector((state: RootState) => state.permission);
   const leaveAllowance = useSelector((state: RootState) => state.timeOff.leaveAllowance);
-  const [attachments, setAttachments] = useState([{ amount: '', attachment: null }]);
+  const [attachments, setAttachments] = useState<{ amount: number; attachment: File }[]>([]);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
@@ -39,6 +39,8 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [totalLeave, setTotalLeave] = useState<number | null>(null);
+  const [defaultAmount, setDefaultAmount] = useState<number>(0); // Tambahkan ini
+  const [defaultAttachment, setDefaultAttachment] = useState<File | null>(null); // Tambahkan ini
 
 
 
@@ -50,22 +52,14 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   }, [dispatch, categoriesStatus]);
 
   const handleAddAttachment = () => {
-    setAttachments([...attachments, { amount: '', attachment: null }]);
+    const emptyFile = new File([], ""); // Membuat file kosong
+    setAttachments([...attachments, { amount: 0, attachment: emptyFile }]);
   };
 
-  const handleRemoveAttachment = (index: any) => {
-    const newAttachments = attachments.filter((_, i) => i !== index);
+  const handleAttachmentChange = (index: number, field: 'amount' | 'attachment', value: any) => {
+    const newAttachments = [...attachments];
+    newAttachments[index][field] = value;
     setAttachments(newAttachments);
-  };
-
-
-  const handleAttachmentChange = (index: number, key: 'amount' | 'attachment', value: any) => {
-    const updatedAttachments = [...attachments];
-    updatedAttachments[index] = {
-      ...updatedAttachments[index],
-      [key]: value,
-    };
-    setAttachments(updatedAttachments);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +124,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
 
     const formattedData = {
       ...formObject,
-      category_permission_id: isNaN(categoryPermissionId) ? null : categoryPermissionId,
+      category_permission_id: isNaN(categoryPermissionId) ? 0 : categoryPermissionId,
       attachment: formData.get('attachment') as File,
       attachments: await Promise.all(attachments.map(async att => ({
         amount: att.amount,
@@ -209,10 +203,6 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     setIsSuccessPopupVisible(false);
   };
 
-  useEffect(() => {
-    console.log('RequestForm rendered');
-  }, []);
-
   return (
     <header className="bg-primary-blue text-white p-4 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
       <div className="flex items-start">
@@ -244,72 +234,36 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                     placeholder={"Tambahkan Keterangan"}
                   />
                 ) : field.type === 'file' ? (
-                  title.includes('Reimbursement') ? (
-                    <div className="mb-4 p-4 bg-white shadow-md rounded-lg mt-4">
-                      <h2 className="text-lg font-semibold text-gray-800 mb-3">Lampiran</h2>
-                      {attachments.map((attachment, index) => (
-                        <div key={index} className="flex flex-col md:flex-row items-center space-x-0 md:space-x-4 mb-4 border-b pb-2">
-                          <input
-                            type="number"
-                            placeholder="Harga"
-                            className="border mb-2 border-gray-300 rounded-lg p-2 w-full md:w-1/4 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            value={attachment.amount}
-                            onChange={(e) => handleAttachmentChange(index, 'amount', Number(e.target.value))}
-                            required
-                          />
-                          <input
-                            type="file"
-                            onChange={(e) => handleAttachmentChange(index, 'attachment', e.target.files?.[0])}
-                            className="border border-gray-300 rounded-lg p-2 w-full md:w-3/4 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveAttachment(index)}
-                            className="text-red-500 hover:text-red-700 transition duration-200 mt-2 md:mt-0 md:ml-2"
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={handleAddAttachment}
-                        className="mt-2 bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200"
-                      >
-                        Tambah
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="w-full border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-black">
-                      <img src="/icons/upload.png" alt="Upload Icon" className="w-10 h-8 mx-auto mb-2" />
-                      <input
-                        id={field.name}
-                        type="file"
-                        name={field.name}
-                        className="hidden"
-                        accept="*/*"
-                        onChange={handleFileChange}
-                      />
-                      <label htmlFor={field.name} className="block text-sm font-medium text-blue-500 cursor-pointer">
-                        Upload Lampiran untuk mengajukan
-                      </label>
-                      <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
-                        Tambahkan bukti untuk mengkonfirmasi
-                      </label>
-                      {filePreview && (
-                        <div className="mt-4">
-                          <img
-                            src={filePreview}
-                            alt="Preview"
-                            className="w-full h-auto border border-gray-300 rounded-lg"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )
+                  <div className="w-full border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-black">
+                    <img src="/icons/upload.png" alt="Camera Icon" className="w-10 h-8 mx-auto mb-2" />
+                    <input
+                      id={field.name}
+                      type="file"
+                      name={field.name}
+                      className="hidden"
+                      accept="*/*"
+                      onChange={handleFileChange}
+                    />
+                    <label htmlFor={field.name} className="block text-sm font-medium text-blue-500 cursor-pointer">
+                      Upload Lampiran untuk mengajukan
+                    </label>
+                    <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
+                      Tambahkan bukti untuk mengkonfirmasi
+                    </label>
+                    {filePreview && (
+                      <div className="mt-4">
+                        <img
+                          src={filePreview}
+                          alt="Preview"
+                          className="w-full h-auto border border-gray-300 rounded-lg"
+                        />
+                      </div>
+                    )}
+                  </div>
                 ) : field.type === 'select' ? (
                   <select
                     id={field.name}
+
                     name={field.name}
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                   >
@@ -371,6 +325,58 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                         </svg>
                       </span>
                     )}
+                  </div>
+                )}
+                {title.includes('Reimbursement') && (
+                  <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-gray-600">Attachments</h2>
+
+                    {/* Field default baru di bawah judul lampiran */}
+                    <div className="flex items-center space-x-4 mb-2">
+                      <input
+                        type="number"
+                        placeholder="Amount"
+                        className="border border-gray-300 rounded-lg p-2 w-1/4"
+                        value={defaultAmount} // Pastikan defaultAmount ada di state
+                        onChange={(e) => setDefaultAmount(Number(e.target.value))} // Set defaultAmount di state
+                        required
+                      />
+                      <input
+                        type="file"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null; 
+                          setDefaultAttachment(file); 
+                        }}
+                        className="border border-gray-300 rounded-lg p-2 w-3/4"
+                      />
+
+                    </div>
+
+                    {attachments.map((attachment, index) => (
+                      <div key={index} className="flex items-center space-x-4 mb-2">
+                        <input
+                          type="number"
+                          placeholder="Amount"
+                          className="border border-gray-300 rounded-lg p-2 w-1/4"
+                          value={attachment.amount}
+                          onChange={(e) => handleAttachmentChange(index, 'amount', Number(e.target.value))}
+                          required
+                        />
+                        <input
+                          type="file"
+                          onChange={(e) => handleAttachmentChange(index, 'attachment', e.target.files?.[0])}
+                          className="border border-gray-300 rounded-lg p-2 w-3/4"
+                        />
+                      </div>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={handleAddAttachment}
+                      className="mt-2 text-blue-500"
+                    >
+                      Tambah Lampiran
+                    </button>
                   </div>
                 )}
               </div>
