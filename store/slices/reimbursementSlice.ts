@@ -4,11 +4,10 @@ import axiosInstance from '../../utils/axiosInstance';
 
 interface Attachment {
     amount: number; // Menggunakan number untuk amount
-    attachment: File | null;  // Menggunakan File untuk attachment
+    attachment: string | null;  // Menggunakan File untuk attachment
 }
 
 interface ReimbursementRequest {
-    category_id: number; // Menambahkan category_id
     start_date: string; // Tanggal mulai
     end_date: string; // Tanggal akhir
     description: string;
@@ -20,15 +19,26 @@ export const submitReimbursementRequest = createAsyncThunk(
     'reimbursement/submitRequest',
     async (formData: ReimbursementRequest, { rejectWithValue }) => {
         const form = new FormData();
-        form.append('category_id', formData.category_id.toString()); // Mengkonversi ke string
         form.append('start_date', formData.start_date);
         form.append('end_date', formData.end_date);
         form.append('description', formData.description);
         form.append('trip', formData.trip);
 
         formData.attachments.forEach((attachment, index) => {
-            form.append(`attachments[${index}][amount]`, attachment.amount.toString()); // Mengkonversi ke string
+            form.append(`attachments[${index}][amount]`, attachment.amount.toString());
             form.append(`attachments[${index}][attachment]`, attachment.attachment ?? '');
+        });
+
+        // Log data yang akan dikirim
+        console.log("Data yang dikirim ke API:", {
+            start_date: formData.start_date,
+            end_date: formData.end_date,
+            description: formData.description,
+            trip: formData.trip,
+            attachments: formData.attachments.map((attachment) => ({
+                amount: attachment.amount,
+                attachment: attachment.attachment,
+            })),
         });
         const response = await axiosInstance.post('/request/reimbursement', form);
         return response.data;

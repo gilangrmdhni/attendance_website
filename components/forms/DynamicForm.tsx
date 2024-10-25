@@ -8,14 +8,29 @@ import router from 'next/router';
 import axios from 'axios';
 import { fetchLeaveAllowance, submitTimeOffRequest } from '@/store/slices/timeOffSlice';
 import { submitOvertimeRequest } from '@/store/slices/overtimeSlice';
-import { submitAttendanceUpdateRequest } from '@/store/slices/attendanceUpdateSlice'; // Import submitAttendanceUpdateRequest
+import { submitAttendanceUpdateRequest } from '@/store/slices/attendanceUpdateSlice';
 import { AiOutlineWarning } from 'react-icons/ai';
+import axiosInstance from '@/utils/axiosInstance';
 
 
 type DynamicFormField = {
   name: string;
   label: string;
   type: 'text' | 'number' | 'email' | 'password' | 'textarea' | 'file' | 'date' | 'select' | 'time' | 'overtime';
+};
+
+interface Attachment {
+  amount: string;
+  attachment: string | null;
+}
+
+const formatRupiah = (amount: number): string => {
+  return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+  }).format(amount);
 };
 
 type DynamicFormProps = {
@@ -30,8 +45,9 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const formRef = useRef<HTMLFormElement>(null);
   const { categories, categoriesStatus } = useSelector((state: RootState) => state.permission);
   const leaveAllowance = useSelector((state: RootState) => state.timeOff.leaveAllowance);
-  const [attachments, setAttachments] = useState([{ amount: '', attachment: null }]);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([
+    { amount: '', attachment: null },
+  ]); const [filePreview, setFilePreview] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
@@ -39,7 +55,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [totalLeave, setTotalLeave] = useState<number | null>(null);
-
+  const [isUploading, setIsUploading] = useState(false);
 
 
   useEffect(() => {
@@ -58,14 +74,34 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     setAttachments(newAttachments);
   };
 
-
-  const handleAttachmentChange = (index: number, key: 'amount' | 'attachment', value: any) => {
-    const updatedAttachments = [...attachments];
-    updatedAttachments[index] = {
-      ...updatedAttachments[index],
-      [key]: value,
-    };
-    setAttachments(updatedAttachments);
+  const handleAttachmentChange = async (index: number, field: string, value: number | File | undefined) => {
+    if (field === 'attachment' && value instanceof File) {
+      setIsUploading(true);
+      const filePath = await uploadFile(value);
+      if (filePath) {
+        setAttachments((prev) => {
+          const updatedAttachments = [...prev];
+          updatedAttachments[index] = {
+            ...updatedAttachments[index],
+            attachment: filePath,
+          };
+          return updatedAttachments;
+        });
+      } else {
+        // Tampilkan pesan kesalahan kepada pengguna
+        console.error('Gagal mengunggah file');
+      }
+      setIsUploading(false); // Pastikan menonaktifkan status upload
+    } else {
+      setAttachments((prev) => {
+        const updatedAttachments = [...prev];
+        updatedAttachments[index] = {
+          ...updatedAttachments[index],
+          [field]: value,
+        };
+        return updatedAttachments;
+      });
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +170,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
       attachment: formData.get('attachment') as File,
       attachments: await Promise.all(attachments.map(async att => ({
         amount: att.amount,
-        attachment: att.attachment ? await uploadFile(att.attachment) : null,
+        attachment: att.attachment,
       }))),
     };
 
@@ -188,19 +224,17 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
-    // Logika untuk mengunggah file dan mengembalikan path
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const response = await axios.post('https://api.attendance.nuncorp.id/api/upload-attachment/file', formData);
-      return response.data.path;
+        const response = await axiosInstance.post('/upload-attachment/file', formData);
+        return response.data.body.file_path; 
     } catch (error) {
-      console.error('File upload error:', error);
-      return null;
+        console.error('Error uploading file:', error);
+        return null; 
     }
-  };
-
+};
   const closeErrorPopup = () => {
     setIsErrorPopupVisible(false);
   };
