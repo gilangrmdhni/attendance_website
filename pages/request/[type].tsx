@@ -20,7 +20,7 @@ const formConfigurations: Record<string, FormConfig> = {
         title: 'Lembur Form',
         fields: [
             { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
-            { type: 'date', label: 'Tanggal Mulai', name: 'end_date' },
+            { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
             { type: 'time', label: 'Jam Mulai', name: 'start_hours' },
             { type: 'time', label: 'Jam Selesai', name: 'end_hours' },
             { type: 'textarea', label: 'Keterangan', name: 'description' },
@@ -41,8 +41,8 @@ const formConfigurations: Record<string, FormConfig> = {
         title: 'Izin Form',
         fields: [
             { type: 'select', label: 'Kategori', name: 'category_permission_id' },
-            { type: 'date', label: 'Tanggal', name: 'start_date' },
-            { type: 'date', label: 'Tanggal', name: 'end_date' },
+            { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
+            { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
             { type: 'textarea', label: 'Deskripsi', name: 'description' },
             { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
