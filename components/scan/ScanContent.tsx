@@ -8,6 +8,7 @@ import SuccessModal from '../../components/SuccessModal'; // Import the SuccessM
 import ErrorModal from '../../components/ErrorModal'; // Import the ErrorModal component
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import axiosInstance from '@/utils/axiosInstance';
 
 
 const Map = dynamic(() => import('../../utils/Map'), { ssr: false });
@@ -31,7 +32,7 @@ const ScanContent = () => {
         // Mendapatkan status approval WFH dari API
         const fetchWFHApprovalStatus = async () => {
             try {
-                const response = await axios.get('https://api.attendance.nuncorp.id/api/request-approval/history?page=1&limit=10');
+                const response = await axiosInstance.get('/request-approval/history?page=1&limit=10');
                 const approvals = response.data.body;
 
                 // Filter untuk izin WFH terbaru
@@ -46,6 +47,7 @@ const ScanContent = () => {
                 console.error('Error fetching approval status:', error);
             }
         };
+
 
         fetchWFHApprovalStatus();
     }, []);
