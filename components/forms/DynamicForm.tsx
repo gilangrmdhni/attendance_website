@@ -26,10 +26,10 @@ interface Attachment {
 
 const formatRupiah = (amount: number): string => {
   return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 };
 
@@ -228,13 +228,13 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     formData.append('file', file);
 
     try {
-        const response = await axiosInstance.post('/upload-attachment/file', formData);
-        return response.data.body.file_path; 
+      const response = await axiosInstance.post('/upload-attachment/file', formData);
+      return response.data.body.file_path;
     } catch (error) {
-        console.error('Error uploading file:', error);
-        return null; 
+      console.error('Error uploading file:', error);
+      return null;
     }
-};
+  };
   const closeErrorPopup = () => {
     setIsErrorPopupVisible(false);
   };
@@ -282,11 +282,11 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                     <div className="mb-4 p-4 bg-white shadow-md rounded-lg mt-4">
                       <h2 className="text-lg font-semibold text-gray-800 mb-3">Lampiran</h2>
                       {attachments.map((attachment, index) => (
-                        <div key={index} className="flex flex-col md:flex-row items-center space-x-0 md:space-x-4 mb-4 border-b pb-2">
+                        <div key={index} className="flex flex-col items-center space-y-2 mb-4 border-b pb-2">
                           <input
                             type="number"
                             placeholder="Harga"
-                            className="border mb-2 border-gray-300 rounded-lg p-2 w-full md:w-1/4 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border border-gray-300 rounded-lg p-2 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
                             value={attachment.amount}
                             onChange={(e) => handleAttachmentChange(index, 'amount', Number(e.target.value))}
                             required
@@ -294,12 +294,12 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                           <input
                             type="file"
                             onChange={(e) => handleAttachmentChange(index, 'attachment', e.target.files?.[0])}
-                            className="border border-gray-300 rounded-lg p-2 w-full md:w-3/4 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border border-gray-300 rounded-lg p-2 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
                           />
                           <button
                             type="button"
                             onClick={() => handleRemoveAttachment(index)}
-                            className="text-red-500 hover:text-red-700 transition duration-200 mt-2 md:mt-0 md:ml-2"
+                            className="text-red-500 hover:text-red-700 transition duration-200"
                           >
                             Hapus
                           </button>
