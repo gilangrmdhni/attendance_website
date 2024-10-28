@@ -85,7 +85,7 @@ const NotificationsComponent: React.FC = () => {
                         {notification.attachment && (
                             <div className="text-sm text-blue-500 mt-2">
                                 <a
-                                    href={`/storage/attachment/${notification.attachment}`}
+                                    href={`https://api.attendance.nuncorp.id${notification.attachment}`} 
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="underline"
