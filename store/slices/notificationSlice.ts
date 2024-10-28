@@ -7,8 +7,9 @@ interface Notification {
   description: string;
   checkintime?: string;
   start_date?: string;
+  end_date?: string;
   status?: string;
-  dates?: string;
+  dates?: string; 
   created_at: string;
   attachment?: string;
 

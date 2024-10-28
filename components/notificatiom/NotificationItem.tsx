@@ -115,6 +115,15 @@ const NotificationsComponent: React.FC = () => {
                                 })}{' '}
                             </p>
                         )}
+                        {notification.end_date && (
+                            <p className="text-sm text-gray-500">
+                                Selesai : {new Date(notification.end_date).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                })}{' '}
+                            </p>
+                        )}
                         {notification.checkintime && (
                             <p className="text-sm text-gray-500">
                                 Check-in Time: {new Date(notification.checkintime).toLocaleTimeString('id-ID')}

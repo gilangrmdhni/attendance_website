@@ -53,7 +53,7 @@ const formConfigurations: Record<string, FormConfig> = {
             { type: 'textarea', label: 'Keterangan', name: 'description' },
             { type: 'date', label: 'Tanggal Mulai', name: 'start_date' },
             { type: 'date', label: 'Tanggal Selesai', name: 'end_date' },
-            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachments' }
+            { type: 'file', label: 'Tambahkan Lampiran', name: 'attachment' }
         ],
     },
 };
