@@ -95,9 +95,22 @@ const ApprovalItem = () => {
                     {requests.map((request, index) => (
                         <div key={request.request_id} className="rounded-lg p-4">
                             <h2 className="text-lg font-semibold text-gray-800">{request.full_name}</h2>
-                            <p className="text-gray-600">{request.category}</p>
-                            <p className="text-gray-600">{request.position}</p>
+                            <p className="text-gray-600">Kategori: {request.category}</p>
+                            <p className="text-gray-600">Posisi: {request.position}</p>
                             <p className="text-gray-500">Status: {request.status}</p>
+                            <p className="text-gray-500">Alasan: {request.description}</p>
+                            {request.attachment && (
+                                <div className="text-sm text-blue-500 mt-2">
+                                    <a
+                                        href={`https://api.attendance.nuncorp.id${request.attachment}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline"
+                                    >
+                                        Unduh Lampiran (PDF)
+                                    </a>
+                                </div>
+                            )}
                             {request.status !== 'approved' && request.status !== 'rejected' && (
                                 <div className="mt-4 flex justify-between">
                                     <button

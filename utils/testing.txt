@@ -8,14 +8,29 @@ import router from 'next/router';
 import axios from 'axios';
 import { fetchLeaveAllowance, submitTimeOffRequest } from '@/store/slices/timeOffSlice';
 import { submitOvertimeRequest } from '@/store/slices/overtimeSlice';
-import { submitAttendanceUpdateRequest } from '@/store/slices/attendanceUpdateSlice'; // Import submitAttendanceUpdateRequest
+import { submitAttendanceUpdateRequest } from '@/store/slices/attendanceUpdateSlice';
 import { AiOutlineWarning } from 'react-icons/ai';
+import axiosInstance from '@/utils/axiosInstance';
 
 
 type DynamicFormField = {
   name: string;
   label: string;
   type: 'text' | 'number' | 'email' | 'password' | 'textarea' | 'file' | 'date' | 'select' | 'time' | 'overtime';
+};
+
+interface Attachment {
+  amount: string;
+  attachment: string | null;
+}
+
+const formatRupiah = (amount: number): string => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 };
 
 type DynamicFormProps = {
@@ -30,18 +45,17 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const formRef = useRef<HTMLFormElement>(null);
   const { categories, categoriesStatus } = useSelector((state: RootState) => state.permission);
   const leaveAllowance = useSelector((state: RootState) => state.timeOff.leaveAllowance);
-  const [attachments, setAttachments] = useState<{ amount: number; attachment: File }[]>([]);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([
+    { amount: '', attachment: null },
+  ]); const [filePreview, setFilePreview] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
   const [isErrorPopupVisible, setIsErrorPopupVisible] = useState<boolean>(false);
   const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [pesanError, setPesanError] = useState<string>('');
   const [totalLeave, setTotalLeave] = useState<number | null>(null);
-  const [defaultAmount, setDefaultAmount] = useState<number>(0); // Tambahkan ini
-  const [defaultAttachment, setDefaultAttachment] = useState<File | null>(null); // Tambahkan ini
-
+  const [isUploading, setIsUploading] = useState(false);
 
 
   useEffect(() => {
@@ -52,14 +66,42 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   }, [dispatch, categoriesStatus]);
 
   const handleAddAttachment = () => {
-    const emptyFile = new File([], ""); // Membuat file kosong
-    setAttachments([...attachments, { amount: 0, attachment: emptyFile }]);
+    setAttachments([...attachments, { amount: '', attachment: null }]);
   };
 
-  const handleAttachmentChange = (index: number, field: 'amount' | 'attachment', value: any) => {
-    const newAttachments = [...attachments];
-    newAttachments[index][field] = value;
+  const handleRemoveAttachment = (index: any) => {
+    const newAttachments = attachments.filter((_, i) => i !== index);
     setAttachments(newAttachments);
+  };
+
+  const handleAttachmentChange = async (index: number, field: string, value: number | File | undefined) => {
+    if (field === 'attachment' && value instanceof File) {
+      setIsUploading(true);
+      const filePath = await uploadFile(value);
+      if (filePath) {
+        setAttachments((prev) => {
+          const updatedAttachments = [...prev];
+          updatedAttachments[index] = {
+            ...updatedAttachments[index],
+            attachment: filePath,
+          };
+          return updatedAttachments;
+        });
+      } else {
+        // Tampilkan pesan kesalahan kepada pengguna
+        console.error('Gagal mengunggah file');
+      }
+      setIsUploading(false); // Pastikan menonaktifkan status upload
+    } else {
+      setAttachments((prev) => {
+        const updatedAttachments = [...prev];
+        updatedAttachments[index] = {
+          ...updatedAttachments[index],
+          [field]: value,
+        };
+        return updatedAttachments;
+      });
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,8 +144,9 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
 
     const formData = new FormData(event.currentTarget);
 
+    // Validasi form
     if (!validateForm(formData)) {
-      setSnackbarMessage('Please fill out all required fields.');
+      setSnackbarMessage('Harap isi semua bidang yang wajib diisi.');
       setSnackbarType('warning');
       setSnackbarVisible(true);
       return;
@@ -121,19 +164,18 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     });
 
     const categoryPermissionId = Number(formObject['category_permission_id']);
-
     const formattedData = {
       ...formObject,
-      category_permission_id: isNaN(categoryPermissionId) ? 0 : categoryPermissionId,
+      category_permission_id: isNaN(categoryPermissionId) ? null : categoryPermissionId,
       attachment: formData.get('attachment') as File,
       attachments: await Promise.all(attachments.map(async att => ({
         amount: att.amount,
-        attachment: att.attachment ? await uploadFile(att.attachment) : null,
+        attachment: att.attachment,
       }))),
     };
 
     try {
-      setSnackbarMessage('Submitting data...');
+      setSnackbarMessage('Mengirim data...');
       setSnackbarType('success');
       setSnackbarVisible(true);
 
@@ -146,55 +188,74 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         response = await dispatch(submitTimeOffRequest(formattedData as any));
       } else if (title.includes('Lembur')) {
         response = await dispatch(submitOvertimeRequest(formattedData as any));
-      } else if (title.includes('Attendance Update')) { // Penanganan untuk Attendance Update
+      } else if (title.includes('Attendance Update')) {
         response = await dispatch(submitAttendanceUpdateRequest(formattedData as any));
       }
 
-      // Cek jika response ada dan mengandung error
-      if (response && response.payload && 'error' in response.payload) {
-        throw new Error(response.payload.error.message || 'Failed to submit data');
+      if (response && response.payload && response.payload.error) {
+        throw new Error(response.payload.error || 'Failed to submit data');
       }
 
-      // Jika tidak ada error, asumsikan berhasil
-      setSnackbarMessage('Data submitted successfully!');
+      setSnackbarMessage('Data berhasil dikirim!');
       setSnackbarType('success');
       setIsSuccessPopupVisible(true);
-    } catch (err: unknown) {
-      console.error('Submission error:', err);
+    } catch (error: unknown) {
+      console.error('Kesalahan pengiriman:', error);
 
-      let errorMessage = 'Failed to submit data. Please try again.';
-      if (axios.isAxiosError(err)) {
-        errorMessage = err.response?.data?.message || 'Something went wrong';
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
+      let pesanError = 'Gagal mengirim data. Silakan coba lagi.';
+      if (axios.isAxiosError(error)) {
+        const statusCode = error.response?.status;
+        const errorResponse = error.response?.data?.error;
+
+        switch (statusCode) {
+          case 400:
+            pesanError = 'Data yang dikirim tidak valid. Periksa kembali data Anda.';
+            break;
+          case 401:
+            pesanError = 'Anda tidak memiliki akses. Silakan login terlebih dahulu.';
+            break;
+          case 403:
+            pesanError = 'Akses ditolak. Anda tidak diizinkan melakukan aksi ini.';
+            break;
+          case 404:
+            pesanError = 'Sumber data tidak ditemukan. Silakan periksa kembali.';
+            break;
+          case 500:
+            pesanError = 'Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.';
+            break;
+          case 503:
+            pesanError = 'Server sedang tidak tersedia. Silakan coba beberapa saat lagi.';
+            break;
+          default:
+            pesanError = errorResponse
+              ? errorResponse
+              : 'Terjadi kesalahan yang tidak diketahui. Silakan coba beberapa saat lagi.';
+            break;
+        }
       }
 
-      setErrorMessage(errorMessage);
+      setPesanError(pesanError);
       setIsErrorPopupVisible(true);
-      setSnackbarMessage(errorMessage);
+      setSnackbarMessage(pesanError);
       setSnackbarType('error');
       setSnackbarVisible(true);
     } finally {
-      if (snackbarVisible) {
-        setSnackbarVisible(true);
-      }
+      setSnackbarVisible(true);
     }
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
-    // Logika untuk mengunggah file dan mengembalikan path
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const response = await axios.post('https://api.attendance.nuncorp.id/api/upload-attachment/file', formData);
-      return response.data.path;
+      const response = await axiosInstance.post('/upload-attachment/file', formData);
+      return response.data.body.file_path;
     } catch (error) {
-      console.error('File upload error:', error);
+      console.error('Error uploading file:', error);
       return null;
     }
   };
-
   const closeErrorPopup = () => {
     setIsErrorPopupVisible(false);
   };
@@ -202,6 +263,10 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const closeSuccessPopup = () => {
     setIsSuccessPopupVisible(false);
   };
+
+  useEffect(() => {
+    console.log('RequestForm rendered');
+  }, []);
 
   return (
     <header className="bg-primary-blue text-white p-4 pb-20 relative bg-[url('/images/header.png')] bg-cover bg-center rounded-b-lg">
@@ -234,36 +299,72 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                     placeholder={"Tambahkan Keterangan"}
                   />
                 ) : field.type === 'file' ? (
-                  <div className="w-full border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-black">
-                    <img src="/icons/upload.png" alt="Camera Icon" className="w-10 h-8 mx-auto mb-2" />
-                    <input
-                      id={field.name}
-                      type="file"
-                      name={field.name}
-                      className="hidden"
-                      accept="*/*"
-                      onChange={handleFileChange}
-                    />
-                    <label htmlFor={field.name} className="block text-sm font-medium text-blue-500 cursor-pointer">
-                      Upload Lampiran untuk mengajukan
-                    </label>
-                    <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
-                      Tambahkan bukti untuk mengkonfirmasi
-                    </label>
-                    {filePreview && (
-                      <div className="mt-4">
-                        <img
-                          src={filePreview}
-                          alt="Preview"
-                          className="w-full h-auto border border-gray-300 rounded-lg"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  title.includes('Reimbursement') ? (
+                    <div className="mb-4 p-4 bg-white shadow-md rounded-lg mt-4">
+                      <h2 className="text-lg font-semibold text-gray-800 mb-3">Lampiran</h2>
+                      {attachments.map((attachment, index) => (
+                        <div key={index} className="flex flex-col items-center space-y-2 mb-4 border-b pb-2">
+                          <input
+                            type="number"
+                            placeholder="Harga"
+                            className="border border-gray-300 rounded-lg p-2 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            value={attachment.amount}
+                            onChange={(e) => handleAttachmentChange(index, 'amount', Number(e.target.value))}
+                            required
+                          />
+                          <input
+                            type="file"
+                            onChange={(e) => handleAttachmentChange(index, 'attachment', e.target.files?.[0])}
+                            className="border border-gray-300 rounded-lg p-2 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveAttachment(index)}
+                            className="text-red-500 hover:text-red-700 transition duration-200"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={handleAddAttachment}
+                        className="mt-2 bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200"
+                      >
+                        Tambah
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full border-2 border-dashed border-blue-300 rounded-lg p-4 text-center text-black">
+                      <img src="/icons/upload.png" alt="Upload Icon" className="w-10 h-8 mx-auto mb-2" />
+                      <input
+                        id={field.name}
+                        type="file"
+                        name={field.name}
+                        className="hidden"
+                        accept="*/*"
+                        onChange={handleFileChange}
+                      />
+                      <label htmlFor={field.name} className="block text-sm font-medium text-blue-500 cursor-pointer">
+                        Upload Lampiran untuk mengajukan
+                      </label>
+                      <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
+                        Tambahkan bukti untuk mengkonfirmasi
+                      </label>
+                      {filePreview && (
+                        <div className="mt-4">
+                          <img
+                            src={filePreview}
+                            alt="Preview"
+                            className="w-full h-auto border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
                 ) : field.type === 'select' ? (
                   <select
                     id={field.name}
-
                     name={field.name}
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                   >
@@ -327,58 +428,6 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                     )}
                   </div>
                 )}
-                {title.includes('Reimbursement') && (
-                  <div className="mb-4">
-                    <h2 className="text-lg font-semibold text-gray-600">Attachments</h2>
-
-                    {/* Field default baru di bawah judul lampiran */}
-                    <div className="flex items-center space-x-4 mb-2">
-                      <input
-                        type="number"
-                        placeholder="Amount"
-                        className="border border-gray-300 rounded-lg p-2 w-1/4"
-                        value={defaultAmount} // Pastikan defaultAmount ada di state
-                        onChange={(e) => setDefaultAmount(Number(e.target.value))} // Set defaultAmount di state
-                        required
-                      />
-                      <input
-                        type="file"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] || null; 
-                          setDefaultAttachment(file); 
-                        }}
-                        className="border border-gray-300 rounded-lg p-2 w-3/4"
-                      />
-
-                    </div>
-
-                    {attachments.map((attachment, index) => (
-                      <div key={index} className="flex items-center space-x-4 mb-2">
-                        <input
-                          type="number"
-                          placeholder="Amount"
-                          className="border border-gray-300 rounded-lg p-2 w-1/4"
-                          value={attachment.amount}
-                          onChange={(e) => handleAttachmentChange(index, 'amount', Number(e.target.value))}
-                          required
-                        />
-                        <input
-                          type="file"
-                          onChange={(e) => handleAttachmentChange(index, 'attachment', e.target.files?.[0])}
-                          className="border border-gray-300 rounded-lg p-2 w-3/4"
-                        />
-                      </div>
-                    ))}
-
-                    <button
-                      type="button"
-                      onClick={handleAddAttachment}
-                      className="mt-2 text-blue-500"
-                    >
-                      Tambah Lampiran
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
           </form>
@@ -403,30 +452,9 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
           </button>
         </div>
       </div>
-      {isSuccessPopupVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-96">
-            <div className="mb-4 w-full items-center">
-              <img
-                src="/icons/eror.png"
-                alt="Success Icon"
-                className="w-20 h-auto object-cover"
-              />
-            </div>
-            <h2 className="text-lg font-semibold text-gray-500">Error</h2>
-            <p className='text-gray-500'>{errorMessage}</p>
-            <button
-              onClick={closeSuccessPopup}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
 
       {isErrorPopupVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999]">
           <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md text-center">
             <div className="mb-4 w-full">
               <img
@@ -438,11 +466,37 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
             <h2 className="text-lg font-semibold text-gray-500">Success</h2>
             <p className='text-gray-500'>Data submitted successfully!</p>
             <button
-              onClick={closeErrorPopup}
+              onClick={closeSuccessPopup}
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {isSuccessPopupVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999]">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="mb-4 flex justify-center">
+              <img
+                src="/icons/eror.png" // Perbaiki nama file dari "eror.png" menjadi "error.png"
+                alt="Error Icon"
+                className="w-20 h-20 object-cover" // Pastikan ukuran gambar sesuai
+              />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-800 text-center">Terjadi Kesalahan</h2>
+            <p className='text-gray-600 text-center mt-2'>
+              {pesanError}
+            </p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={closeSuccessPopup}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}

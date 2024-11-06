@@ -4,7 +4,7 @@ import axiosInstance from '../../utils/axiosInstance';
 
 interface Attachment {
     amount: number; // Menggunakan number untuk amount
-    attachment: string | null;  // Menggunakan File untuk attachment
+    attachment: string | null;  // Menggunakan string untuk attachment (URL atau path file)
 }
 
 interface ReimbursementRequest {
@@ -46,13 +46,17 @@ export const submitReimbursementRequest = createAsyncThunk(
             // Handling network errors
             if (!error.response) {
                 console.error("Network error:", error.message);
-                return rejectWithValue("Network error: Unable to reach the server. Please check your connection.");
+                return rejectWithValue({
+                    code: 0,
+                    message: "Kesalahan jaringan: Tidak dapat menghubungi server. Silakan periksa koneksi Anda.",
+                    details: error.message,
+                });
             }
 
             // Handling response with status 400-499 (client errors)
             if (error.response.status >= 400 && error.response.status < 500) {
-                const errorMessage = error.response.data.message || "Bad Request";
-                console.error("Client error:", errorMessage);
+                const errorMessage = error.response.data.message || "Permintaan tidak valid. Silakan periksa kembali inputan Anda.";
+                console.error("Kesalahan klien:", errorMessage);
                 return rejectWithValue({
                     code: error.response.status,
                     message: errorMessage,
@@ -60,27 +64,65 @@ export const submitReimbursementRequest = createAsyncThunk(
                 });
             }
 
+            // Handling response with status 401 (Unauthorized)
+            if (error.response.status === 401) {
+                console.error("Unauthorized:", error.response.data.message || "Akses tidak sah. Silakan login untuk melanjutkan.");
+                return rejectWithValue({
+                    code: 401,
+                    message: "Akses ditolak. Anda perlu login untuk melanjutkan.",
+                    details: error.response.data.error || null,
+                });
+            }
+
+            // Handling response with status 403 (Forbidden)
+            if (error.response.status === 403) {
+                console.error("Forbidden:", error.response.data.message || "Anda tidak memiliki izin untuk melakukan tindakan ini.");
+                return rejectWithValue({
+                    code: 403,
+                    message: "Anda tidak memiliki izin untuk melakukan tindakan ini.",
+                    details: error.response.data.error || null,
+                });
+            }
+
+            // Handling response with status 404 (Not Found)
+            if (error.response.status === 404) {
+                console.error("Not Found:", error.response.data.message || "Data yang diminta tidak ditemukan.");
+                return rejectWithValue({
+                    code: 404,
+                    message: "Data yang diminta tidak ditemukan.",
+                    details: error.response.data.error || null,
+                });
+            }
+
             // Handling response with status 500+ (server errors)
             if (error.response.status >= 500) {
-                console.error("Server error:", error.response.data.message || "Internal Server Error");
+                console.error("Server error:", error.response.data.message || "Terjadi kesalahan internal server.");
                 return rejectWithValue({
                     code: error.response.status,
-                    message: "Server error: Please try again later or contact support.",
+                    message: "Terjadi kesalahan di server, coba lagi nanti atau hubungi dukungan.",
+                    details: error.response.data.error || null,
                 });
             }
 
             // Handling any other unclassified errors
-            console.error("Unexpected error:", error.message);
-            return rejectWithValue("Unexpected error occurred. Please try again.");
+            console.error("Kesalahan tak terduga:", error.message);
+            return rejectWithValue({
+                code: 0,
+                message: "Terjadi kesalahan yang tidak terduga. Mohon coba lagi.",
+                details: error.message,
+            });
         }
     }
 );
 
-
 const initialState = {
     data: null as any,
     status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
-    error: null as string | null,
+    error: null as {
+        code: number;
+        message: string;
+        details?: string | null;
+    } | null,
 };
 
 const reimbursementSlice = createSlice({
@@ -99,7 +141,7 @@ const reimbursementSlice = createSlice({
             })
             .addCase(submitReimbursementRequest.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.payload as string;
+                state.error = action.payload as { code: number; message: string; details?: string };
             });
     },
 });

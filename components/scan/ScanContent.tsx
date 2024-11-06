@@ -108,7 +108,7 @@ const ScanContent = () => {
         formData.append('checkin_latitude', selectedLocation.latitude.toString());
         formData.append('checkin_longitude', selectedLocation.longitude.toString());
         formData.append('picture', selectedFile);
-
+    
         try {
             if (selectedOption === 'WFO') {
                 await dispatch(checkInWFO(formData)).unwrap();
@@ -116,19 +116,25 @@ const ScanContent = () => {
                 await dispatch(checkInWFAWFH(formData)).unwrap();
             }
             setIsCheckedIn(true);
-        } catch (error: any) { // Ubah di sini untuk menetapkan tipe 'any'
+        } catch (error: any) {
             console.error("Check-in error:", error);
-
-            // Ambil pesan kesalahan dari API
-            if (error && error.data && error.data.error) {
-                setErrorMessage(error.data.error); // Set pesan kesalahan dari API
+    
+            // Cek status kode dari respons
+            if (error?.response?.status === 400) {
+                // Kode 400 - Bad Request
+                const errorMessage = error.response.data?.error || "Terjadi kesalahan atau anda sudah check-in hari ini.";
+                setErrorMessage(errorMessage);
+            } else if (error?.response?.status === 500) {
+                // Kode 500 - Internal Server Error
+                setErrorMessage("Terjadi masalah pada server, coba lagi nanti.");
             } else {
-                setErrorMessage('Failed to check in.'); // Pesan default jika tidak ada pesan dari API
+                // Default error jika kode status tidak sesuai
+                setErrorMessage('Terjadi kesalahan atau anda sudah check-in hari ini.');
             }
             setIsErrorModalVisible(true);
         }
     };
-
+    
     const closePopup = () => {
         setIsPopupVisible(false);
     };
@@ -136,8 +142,9 @@ const ScanContent = () => {
     const closeSuccessModal = () => {
         setIsSuccessModalVisible(false);
         setIsCheckedIn(false); // Reset checked-in status
-        window.location.reload();
-        router.push('/'); // Arahkan ke halaman home
+        router.push('/').then(() => {
+            window.location.reload(); // Reload halaman setelah navigasi
+        });
     };
 
     const closeErrorModal = () => {
@@ -265,7 +272,7 @@ const ScanContent = () => {
             <ErrorModal
                 isVisible={isErrorModalVisible}
                 onClose={closeErrorModal}
-                errorMessage={errorMessage}
+                error={errorMessage}
             />
         </section>
     );

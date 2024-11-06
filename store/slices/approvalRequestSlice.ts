@@ -4,9 +4,11 @@ import axiosInstance from '../../utils/axiosInstance';
 
 // Interface untuk Approval Request
 interface ApprovalRequest {
+    description: string;
     request_id: number;
     full_name: string;
     position: string;
+    attachment: File;
     status: string;
     category: string;
 }

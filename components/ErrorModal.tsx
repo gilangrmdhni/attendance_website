@@ -3,10 +3,10 @@ import React from 'react';
 interface ErrorModalProps {
     isVisible: boolean;
     onClose: () => void;
-    errorMessage: string | null;
+    error: string | null;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ isVisible, onClose, errorMessage }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ isVisible, onClose, error }) => {
     if (!isVisible) return null;
 
     return (
@@ -21,7 +21,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ isVisible, onClose, errorMessag
                 </div>
                 <h2 className="text-xl font-semibold text-gray-800 text-center">Terjadi Kesalahan</h2>
                 <p className='text-gray-600 text-center mt-2'>
-                    {errorMessage || 'Terjadi kesalahan yang tidak terduga.'}
+                    {error || 'Terjadi kesalahan yang tidak terduga.'}
                 </p>
                 <div className="flex justify-center mt-4">
                     <button

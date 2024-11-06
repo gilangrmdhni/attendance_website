@@ -49,14 +49,14 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     { amount: '', attachment: null },
   ]); const [filePreview, setFilePreview] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
-  const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning'>('success');
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
   const [isErrorPopupVisible, setIsErrorPopupVisible] = useState<boolean>(false);
   const [isSuccessPopupVisible, setIsSuccessPopupVisible] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [totalLeave, setTotalLeave] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-
+  const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (categoriesStatus === 'idle') {
@@ -105,20 +105,31 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);  // Menyimpan file yang dipilih ke dalam state
+      if (selectedFile.size > 5 * 1024 * 1024) {
         setSnackbarMessage('File size exceeds the 5MB limit.');
         setSnackbarType('warning');
         setSnackbarVisible(true);
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFilePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      if (selectedFile.type.startsWith('image/')) {
+        // Jika file adalah gambar, tampilkan preview gambar
+        reader.onloadend = () => {
+          setFilePreview(reader.result as string);
+        };
+        reader.readAsDataURL(selectedFile);
+      } else {
+        // Jika file bukan gambar, tampilkan nama file atau ikon
+        setFilePreview(null);
+        setSnackbarMessage(`File ${selectedFile.name} siap diunggah.`);
+        setSnackbarType('info');
+        setSnackbarVisible(true);
+      }
     } else {
+      setFile(null);
       setFilePreview(null);
     }
   };
@@ -144,6 +155,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
 
     const formData = new FormData(event.currentTarget);
 
+    // Validasi form
     if (!validateForm(formData)) {
       setSnackbarMessage('Please fill out all required fields.');
       setSnackbarType('warning');
@@ -154,6 +166,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     const formObject: { [key: string]: FormDataEntryValue | undefined } = Object.fromEntries(formData.entries());
     console.log('Data yang akan dikirim:', formObject);
 
+    // Format fields tanggal
     const dateFields = fields.filter(f => f.type === 'date').map(f => f.name);
     dateFields.forEach((field) => {
       const value = formObject[field];
@@ -164,6 +177,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
 
     const categoryPermissionId = Number(formObject['category_permission_id']);
 
+    // Format data untuk dikirim
     const formattedData = {
       ...formObject,
       category_permission_id: isNaN(categoryPermissionId) ? null : categoryPermissionId,
@@ -175,6 +189,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     };
 
     try {
+      // Tampilkan snackbar "Submitting data..."
       setSnackbarMessage('Submitting data...');
       setSnackbarType('success');
       setSnackbarVisible(true);
@@ -188,36 +203,59 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         response = await dispatch(submitTimeOffRequest(formattedData as any));
       } else if (title.includes('Lembur')) {
         response = await dispatch(submitOvertimeRequest(formattedData as any));
-      } else if (title.includes('Attendance Update')) { // Penanganan untuk Attendance Update
+      } else if (title.includes('Attendance Update')) {
         response = await dispatch(submitAttendanceUpdateRequest(formattedData as any));
       }
 
-      // Cek jika response ada dan mengandung error
-      if (response && response.payload && 'error' in response.payload) {
-        throw new Error(response.payload.error.message || 'Failed to submit data');
+      // Cek jika response mengandung error
+      if (response && response.payload && response.payload.error) {
+        throw new Error(response.payload.error || 'Failed to submit data');
       }
 
-      // Jika tidak ada error, asumsikan berhasil
+      // Jika tidak ada error, berarti submit berhasil
       setSnackbarMessage('Data submitted successfully!');
       setSnackbarType('success');
       setIsSuccessPopupVisible(true);
     } catch (err: unknown) {
-      console.error('Submission error:', err);
+      console.log('Error yang diterima:', err);
+      let errorMessage = 'Terjadi kesalahan yang tidak terduga pada aplikasi. Mohon coba lagi.';
 
-      let errorMessage = 'Failed to submit data. Please try again.';
       if (axios.isAxiosError(err)) {
-        errorMessage = err.response?.data?.message || 'Something went wrong';
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
+        if (err.response) {
+          const statusCode = err.response.status;
+          const errorData = err.response.data;
+          console.log('Error response:', errorData);
+
+          if (statusCode === 400) {
+            errorMessage = errorData?.message || 'Permintaan tidak valid. Periksa inputan Anda.';
+          } else if (statusCode === 401) {
+            errorMessage = 'Akses ditolak. Anda perlu login untuk melanjutkan.';
+          } else if (statusCode === 403) {
+            errorMessage = 'Anda tidak memiliki izin untuk melakukan tindakan ini.';
+          } else if (statusCode === 404) {
+            errorMessage = 'Data yang Anda cari tidak ditemukan.';
+          } else if (statusCode === 500) {
+            errorMessage = 'Terjadi kesalahan di server. Mohon coba lagi nanti.';
+          } else if (statusCode === 503) {
+            errorMessage = 'Layanan sedang tidak tersedia. Coba lagi nanti.';
+          } else {
+            errorMessage = errorData?.error || 'Terjadi kesalahan yang tidak terduga. Mohon coba lagi.';
+          }
+        } else if (err.request) {
+          errorMessage = 'Tidak ada respons dari server. Mohon periksa koneksi internet Anda.';
+        } else {
+          errorMessage = 'Terjadi kesalahan dalam pengaturan permintaan. Silakan coba lagi.';
+        }
+      } else {
+        errorMessage = 'Terjadi kesalahan yang tidak terduga pada aplikasi. Mohon coba lagi.';
       }
 
-      setErrorMessage(errorMessage);
-      setIsErrorPopupVisible(true);
-      setSnackbarMessage(errorMessage);
-      setSnackbarType('error');
-      setSnackbarVisible(true);
-    } finally {
-      if (snackbarVisible) {
+      // Update state dan tampilkan popup error hanya sekali
+      if (!isErrorPopupVisible) {
+        setErrorMessage(errorMessage);
+        setIsErrorPopupVisible(true);
+        setSnackbarMessage(errorMessage);
+        setSnackbarType('error');
         setSnackbarVisible(true);
       }
     }
@@ -330,13 +368,25 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                       <label htmlFor={field.name} className="block text-xs font-normal text-gray-500 cursor-pointer">
                         Tambahkan bukti untuk mengkonfirmasi
                       </label>
-                      {filePreview && (
+                      {filePreview ? (
                         <div className="mt-4">
                           <img
                             src={filePreview}
                             alt="Preview"
                             className="w-full h-auto border border-gray-300 rounded-lg"
                           />
+                        </div>
+                      ) : (
+                        <div className="mt-4 text-gray-700">
+                          {file ? (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm">{file.name}</span>
+                              {/* Ikon file sesuai jenis */}
+                              <AiOutlineWarning className="text-blue-500" />
+                            </div>
+                          ) : (
+                            <span></span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -432,29 +482,33 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         </div>
       </div>
       {isSuccessPopupVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-96">
-            <div className="mb-4 w-full items-center">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999]">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className="mb-4 flex justify-center">
               <img
-                src="/icons/eror.png"
-                alt="Success Icon"
-                className="w-20 h-auto object-cover"
+                src="/icons/eror.png" // Perbaiki nama file dari "eror.png" menjadi "error.png"
+                alt="Error Icon"
+                className="w-20 h-20 object-cover" // Pastikan ukuran gambar sesuai
               />
             </div>
-            <h2 className="text-lg font-semibold text-gray-500">Error</h2>
-            <p className='text-gray-500'>{errorMessage}</p>
-            <button
-              onClick={closeSuccessPopup}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
-            >
-              Close
-            </button>
+            <h2 className="text-xl font-semibold text-gray-800 text-center">Terjadi Kesalahan</h2>
+            <p className='text-gray-600 text-center mt-2'>
+              {errorMessage || 'Gagal Untuk Membuat Formulir.'}
+            </p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={closeSuccessPopup}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {isErrorPopupVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999]">
           <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md text-center">
             <div className="mb-4 w-full">
               <img

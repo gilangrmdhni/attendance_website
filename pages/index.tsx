@@ -10,11 +10,14 @@ const Home = () => {
     const [showLocationPopup, setShowLocationPopup] = useState(false);
 
     useEffect(() => {
-        // Cek status izin lokasi
-        if ('permissions' in navigator) {
+        // Periksa jika popup sudah pernah ditampilkan sebelumnya
+        const popupShown = localStorage.getItem('locationPopupShown');
+
+        // Jika popup belum pernah ditampilkan, periksa izin lokasi
+        if (!popupShown && 'permissions' in navigator) {
             navigator.permissions.query({ name: 'geolocation' }).then((result) => {
                 if (result.state === 'denied' || result.state === 'prompt') {
-                    setShowLocationPopup(true); // Tampilkan popup jika izin belum diberikan
+                    setShowLocationPopup(true);
                 }
             }).catch((error) => {
                 console.error("Error checking geolocation permission: ", error);
@@ -27,7 +30,9 @@ const Home = () => {
     };
 
     const handleClosePopup = () => {
-        setShowLocationPopup(false); // Menutup popup
+        // Setelah popup ditutup, tandai bahwa popup sudah pernah ditampilkan
+        localStorage.setItem('locationPopupShown', 'true');
+        setShowLocationPopup(false); 
     };
 
     return (
