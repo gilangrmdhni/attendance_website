@@ -58,6 +58,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
   const [snackbarType, setSnackbarType] = useState<'success' | 'error' | 'warning' | 'info'>('success');
   const [file, setFile] = useState<File | null>(null);
 
+
   useEffect(() => {
     if (categoriesStatus === 'idle') {
       dispatch(fetchCategories());
@@ -189,12 +190,12 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     };
 
     try {
-      // Tampilkan snackbar "Submitting data..."
       setSnackbarMessage('Submitting data...');
       setSnackbarType('success');
       setSnackbarVisible(true);
 
       let response;
+
       if (title.includes('Izin')) {
         response = await dispatch(submitPermissionRequest(formattedData as any));
       } else if (title.includes('Reimbursement')) {
@@ -207,50 +208,80 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         response = await dispatch(submitAttendanceUpdateRequest(formattedData as any));
       }
 
-      // Cek jika response mengandung error
-      if (response && response.payload && response.payload.error) {
-        throw new Error(response.payload.error || 'Failed to submit data');
+      console.log('Response from dispatch:', response);
+      console.log('Response payload', response?.payload);
+      if (response?.type?.includes('rejected')) {
+        const errorMessage = response?.payload || 'Terjadi kesalahan pada pengiriman data.';
+        throw new Error(errorMessage);
       }
 
-      // Jika tidak ada error, berarti submit berhasil
-      setSnackbarMessage('Data submitted successfully!');
-      setSnackbarType('success');
-      setIsSuccessPopupVisible(true);
-    } catch (err: unknown) {
-      console.log('Error yang diterima:', err);
-      let errorMessage = 'Terjadi kesalahan yang tidak terduga pada aplikasi. Mohon coba lagi.';
-
-      if (axios.isAxiosError(err)) {
-        if (err.response) {
-          const statusCode = err.response.status;
-          const errorData = err.response.data;
-          console.log('Error response:', errorData);
-
-          if (statusCode === 400) {
-            errorMessage = errorData?.message || 'Permintaan tidak valid. Periksa inputan Anda.';
-          } else if (statusCode === 401) {
-            errorMessage = 'Akses ditolak. Anda perlu login untuk melanjutkan.';
-          } else if (statusCode === 403) {
-            errorMessage = 'Anda tidak memiliki izin untuk melakukan tindakan ini.';
-          } else if (statusCode === 404) {
-            errorMessage = 'Data yang Anda cari tidak ditemukan.';
-          } else if (statusCode === 500) {
-            errorMessage = 'Terjadi kesalahan di server. Mohon coba lagi nanti.';
-          } else if (statusCode === 503) {
-            errorMessage = 'Layanan sedang tidak tersedia. Coba lagi nanti.';
-          } else {
-            errorMessage = errorData?.error || 'Terjadi kesalahan yang tidak terduga. Mohon coba lagi.';
-          }
-        } else if (err.request) {
-          errorMessage = 'Tidak ada respons dari server. Mohon periksa koneksi internet Anda.';
+      if (response && response.payload) {
+        console.log('Payload:', response.payload);
+        if (response.payload.code === 200) {
+          setSnackbarMessage(response.payload.message || 'Data submitted successfully!');
+          setSnackbarType('success');
+          setIsSuccessPopupVisible(true);
         } else {
-          errorMessage = 'Terjadi kesalahan dalam pengaturan permintaan. Silakan coba lagi.';
+          throw new Error(response.payload.message || 'Terjadi kesalahan pada pengiriman data.');
         }
       } else {
-        errorMessage = 'Terjadi kesalahan yang tidak terduga pada aplikasi. Mohon coba lagi.';
+        console.error('Tidak ada payload dalam respons:', response);
+        throw new Error('Tidak ada payload dalam respons.');
       }
 
-      // Update state dan tampilkan popup error hanya sekali
+    } catch (err: unknown) {
+      console.log('Error Masuk ke Catch', err); // Pastikan catch dijalankan
+      console.log('Full Error:', err);
+    
+      let errorMessage = 'Terjadi kesalahan yang tidak terduga. Mohon coba lagi.';
+    
+      // Cek apakah error berasal dari dispatch dengan properti 'type' dan 'payload'
+      if ((err as any)?.type === 'permission/submitRequest/rejected') {
+        console.log('Response from dispatch:', err);
+        errorMessage = (err as any)?.payload || 'Terjadi kesalahan pada pengiriman data.';
+      }
+      // Jika bukan error dispatch, lanjut ke pengecekan Axios error
+      else if ((err as any)?.response) {
+        const statusCode = (err as any)?.response?.data?.code;
+        const errorDetail = (err as any)?.response?.data?.detail || '';
+        const errorMessageFromServer = (err as any)?.response?.data?.message || 'Terjadi kesalahan pada server';
+    
+        switch (statusCode) {
+          case 400:
+            errorMessage = 'Permintaan tidak valid. Periksa inputan Anda.';
+            break;
+          case 401:
+            errorMessage = 'Akses ditolak. Anda perlu login untuk melanjutkan.';
+            break;
+          case 403:
+            errorMessage = 'Anda tidak memiliki izin untuk melakukan tindakan ini.';
+            break;
+          case 404:
+            errorMessage = 'Data yang Anda cari tidak ditemukan.';
+            break;
+          case 413:
+            errorMessage = 'Ukuran data terlalu besar. Mohon kurangi ukuran file atau jumlah data yang dikirim.';
+            break;
+          case 500:
+            errorMessage = `${errorMessageFromServer}: ${errorDetail || 'Coba lagi nanti.'}`;
+            break;
+          case 503:
+            errorMessage = 'Layanan sedang tidak tersedia. Coba lagi nanti.';
+            break;
+          default:
+            errorMessage = `Terjadi kesalahan. Status: ${statusCode}. ${errorDetail || ''}`;
+            break;
+        }
+      } else if ((err as any)?.request) {
+        // Jika tidak ada respons dari server
+        console.log('Tidak ada respons dari server');
+        errorMessage = 'Tidak ada respons dari server. Mohon periksa koneksi internet Anda.';
+      } else {
+        console.log('Non-Axios Error:', err);
+        errorMessage = 'Terjadi kesalahan yang tidak terduga.';
+      }
+    
+      // Menampilkan pesan error jika popup belum terlihat
       if (!isErrorPopupVisible) {
         setErrorMessage(errorMessage);
         setIsErrorPopupVisible(true);
@@ -258,7 +289,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         setSnackbarType('error');
         setSnackbarVisible(true);
       }
-    }
+    }    
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
@@ -385,7 +416,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
                               <AiOutlineWarning className="text-blue-500" />
                             </div>
                           ) : (
-                            <span></span>
+                            <span>No file selected</span>
                           )}
                         </div>
                       )}
@@ -481,23 +512,23 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
           </button>
         </div>
       </div>
-      {isSuccessPopupVisible && (
+      {isErrorPopupVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999]">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <div className="mb-4 flex justify-center">
               <img
-                src="/icons/eror.png" // Perbaiki nama file dari "eror.png" menjadi "error.png"
+                src="/icons/eror.png"
                 alt="Error Icon"
-                className="w-20 h-20 object-cover" // Pastikan ukuran gambar sesuai
+                className="w-20 h-20 object-cover"
               />
             </div>
             <h2 className="text-xl font-semibold text-gray-800 text-center">Terjadi Kesalahan</h2>
             <p className='text-gray-600 text-center mt-2'>
-              {errorMessage || 'Gagal Untuk Membuat Formulir.'}
+              {errorMessage}
             </p>
             <div className="flex justify-center mt-4">
               <button
-                onClick={closeSuccessPopup}
+                onClick={closeErrorPopup}
                 className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
               >
                 Tutup
@@ -507,7 +538,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         </div>
       )}
 
-      {isErrorPopupVisible && (
+      {isSuccessPopupVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[9999]">
           <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md text-center">
             <div className="mb-4 w-full">
@@ -520,7 +551,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
             <h2 className="text-lg font-semibold text-gray-500">Success</h2>
             <p className='text-gray-500'>Data submitted successfully!</p>
             <button
-              onClick={closeErrorPopup}
+              onClick={closeSuccessPopup}
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
             >
               Close
