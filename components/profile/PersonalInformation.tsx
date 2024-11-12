@@ -18,6 +18,7 @@ const PersonalInformation = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [originalName, setOriginalName] = useState('');
+    const [originalUsername, setOriginalUsername] = useState('');
     const [originalEmail, setOriginalEmail] = useState('');
     const [originalPhoneNumber, setOriginalPhoneNumber] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -33,7 +34,9 @@ const PersonalInformation = () => {
             setName(user.full_name || '');
             setEmail(user.email || '');
             setPhoneNumber(user.phone_number || '');
+            setUsername(user.username || '');
             setOriginalName(user.full_name || '');
+            setOriginalUsername(user.username || '');
             setOriginalEmail(user.email || '');
             setOriginalPhoneNumber(user.phone_number || '');
         }
@@ -163,7 +166,7 @@ const PersonalInformation = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-500 text-sm mb-2" htmlFor="email">Username</label>
+                        <label className="block text-gray-500 text-sm mb-2" htmlFor="username">Username</label>
                         <input
                             type="username"
                             id="username"
