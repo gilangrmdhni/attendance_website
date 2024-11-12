@@ -76,7 +76,7 @@ const HistoryHeader = ({
                     className={`px-4 py-2 rounded-lg mx-2 ${activeTab === 'Attendance' ? 'bg-blue-800 text-white' : 'bg-white text-gray-400'}`}
                     onClick={() => setActiveTab('Attendance')}
                 >
-                    Kehadrian
+                    Kehadiran
                 </button>
                 <button
                     className={`px-4 py-2 rounded-lg mx-2 ${activeTab === 'Time Off' ? 'bg-blue-800 text-white' : 'bg-white text-gray-400'}`}

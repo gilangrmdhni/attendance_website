@@ -4,25 +4,27 @@ import { useRouter } from 'next/router';
 import { fetchUser } from '@/store/slices/userSlice';
 import axiosInstance from '@/utils/axiosInstance';
 import { AppDispatch, RootState } from '../store/store';
-import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'; // Impor ikon mata
+import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import MobileContainer from '@/components/MobileContainer';
 import Footer from '@/components/Footer';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const ChangePassword = () => {
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showNewPassword, setShowNewPassword] = useState(false); // State untuk menampilkan/menyembunyikan password
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State untuk menampilkan/menyembunyikan confirm password
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isPasswordChanged, setIsPasswordChanged] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false); // State untuk snackbar
 
   const router = useRouter();
-
-  const { user, loading: userLoading, error } = useSelector((state: RootState) => state.user);
+  const { user, loading: userLoading } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     dispatch(fetchUser());
@@ -31,6 +33,7 @@ const ChangePassword = () => {
   const handleRequestOtp = async () => {
     if (!user?.email) {
       setMessage('Please update your email before requesting OTP.');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -39,9 +42,11 @@ const ChangePassword = () => {
       await axiosInstance.post('/auth/request-otp', { email: user.email });
       setMessage('OTP sent to your email.');
       setIsOtpSent(true);
+      setOpenSnackbar(true);
     } catch (error) {
       console.error('Error requesting OTP:', error);
       setMessage('Failed to send OTP. Please try again.');
+      setOpenSnackbar(true);
     } finally {
       setLoading(false);
     }
@@ -50,6 +55,7 @@ const ChangePassword = () => {
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       setMessage('Passwords do not match.');
+      setOpenSnackbar(true);
       return;
     }
 
@@ -62,13 +68,19 @@ const ChangePassword = () => {
       });
       setMessage('Password changed successfully!');
       setIsPasswordChanged(true);
+      setOpenSnackbar(true);
     } catch (error) {
       console.error('Error changing password:', error);
       setMessage('Failed to change password. Please try again.');
       setIsPasswordChanged(false);
+      setOpenSnackbar(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   if (userLoading) {
@@ -141,6 +153,7 @@ const ChangePassword = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
+                    {showConfirmPassword ? <EyeIcon className="w-6 h-6" /> : <EyeSlashIcon className="w-6 h-6" />}
                   </button>
                 </div>
               </div>
@@ -154,19 +167,24 @@ const ChangePassword = () => {
             </>
           ) : (
             <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md flex items-center">
-              <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m0 0V8h.01M12 18h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
               <span>Tidak ada alamat email yang ditemukan. Harap perbarui profil Anda untuk menyertakan alamat email.</span>
             </div>
-          )}
-          {/* Pesan sukses atau error */}
-          {message && (
-            <p className={`mt-4 text-${isPasswordChanged ? 'green' : 'red'}-500`}>{message}</p>
           )}
         </div>
       </div>
       <Footer />
+      
+      {/* Snackbar */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={isPasswordChanged ? 'success' : 'error'} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </MobileContainer>
   );
 };

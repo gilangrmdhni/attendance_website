@@ -274,7 +274,7 @@ const Header = () => {
                     </div>
                 </div>
 
-                <div className="absolute justify-center right-4 top-full mt-[-70px] w-full max-w-[350px]">
+                <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-[-70px] w-full max-w-xs">
                     <div className="bg-white text-black p-4 rounded-lg shadow-md text-center">
                         <p className="text-md text-gray-600 mb-2">
                             {new Date().toLocaleDateString('id-ID', {
