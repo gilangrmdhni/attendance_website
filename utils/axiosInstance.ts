@@ -18,9 +18,13 @@ axiosInstance.interceptors.request.use(config => {
 axiosInstance.interceptors.response.use(response => {
     return response;
 }, error => {
-    if (error.response && error.response.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login'; 
+    if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 401 && data?.message === 'Token expired') {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
     }
     return Promise.reject(error);
 });
