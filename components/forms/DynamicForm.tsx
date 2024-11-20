@@ -105,6 +105,9 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
     }
   };
 
+
+
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
@@ -221,6 +224,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
           setSnackbarMessage(response.payload.message || 'Data submitted successfully!');
           setSnackbarType('success');
           setIsSuccessPopupVisible(true);
+          router.push('/');
         } else {
           throw new Error(response.payload.message || 'Terjadi kesalahan pada pengiriman data.');
         }
@@ -229,12 +233,13 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         throw new Error('Tidak ada payload dalam respons.');
       }
 
+
     } catch (err: unknown) {
       console.log('Error Masuk ke Catch', err); // Pastikan catch dijalankan
       console.log('Full Error:', err);
-    
+
       let errorMessage = 'Terjadi kesalahan yang tidak terduga. Mohon coba lagi.';
-    
+
       // Cek apakah error berasal dari dispatch dengan properti 'type' dan 'payload'
       if ((err as any)?.type === 'permission/submitRequest/rejected') {
         console.log('Response from dispatch:', err);
@@ -245,7 +250,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         const statusCode = (err as any)?.response?.data?.code;
         const errorDetail = (err as any)?.response?.data?.detail || '';
         const errorMessageFromServer = (err as any)?.response?.data?.message || 'Terjadi kesalahan pada server';
-    
+
         switch (statusCode) {
           case 400:
             errorMessage = 'Permintaan tidak valid. Periksa inputan Anda.';
@@ -280,7 +285,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         console.log('Non-Axios Error:', err);
         errorMessage = 'Terjadi kesalahan yang tidak terduga.';
       }
-    
+
       // Menampilkan pesan error jika popup belum terlihat
       if (!isErrorPopupVisible) {
         setErrorMessage(errorMessage);
@@ -289,7 +294,7 @@ const DynamicFormWithHeader: React.FC<DynamicFormProps> = ({ title, description,
         setSnackbarType('error');
         setSnackbarVisible(true);
       }
-    }    
+    }
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
