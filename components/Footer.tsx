@@ -26,7 +26,7 @@ const Footer = () => {
           <span className="text-xs">Request</span>
         </a>
       </Link>
-      <Link href="/scan" legacyBehavior>
+      {/* <Link href="/scan" legacyBehavior>
         <a className={`flex flex-col items-center ${router.pathname === '/scan' ? 'text-blue-800' : 'text-gray-400'}`}>
           <div className="bg-blue-800 p-3 rounded-full">
             <img
@@ -36,7 +36,7 @@ const Footer = () => {
             />
           </div>
         </a>
-      </Link>
+      </Link> */}
       <Link href="/history" legacyBehavior>
         <a className={`flex flex-col items-center ${router.pathname === '/history' ? 'text-blue-800' : 'text-gray-400'}`}>
           <img

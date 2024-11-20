@@ -309,15 +309,31 @@ const Header = () => {
                             <span className='text-gray-400'>Waktu jam kerja</span>
                         </div>
                         <button
-                            className={`${buttonDisabled
-                                ? 'bg-gray-400 cursor-not-allowed'
+                            className={`${checkinAt
+                                ? buttonDisabled
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-primary-blue'
                                 : 'bg-primary-blue'
-                                } text-white font-semibold py-2 px-4 rounded-lg mt-4 w-full`}
-                            onClick={handleCheckout}
-                            disabled={buttonDisabled}
+                                } flex items-center justify-center text-white font-semibold py-2 px-4 rounded-lg mt-4 w-full`}
+                            onClick={() => {
+                                if (!checkinAt) {
+                                    router.push('/scan');
+                                } else {
+                                    handleCheckout();
+                                }
+                            }}
+                            disabled={Boolean(checkinAt) && buttonDisabled}
                         >
-                            {checkoutSuccessful ? 'Sudah Absen Keluar' : 'Absen Keluar'}
+                            <img
+                                src={checkinAt ? '/icons/checkincheckout.png' : '/icons/checkincheckout.png'}
+                                alt={checkinAt ? 'Checkout Icon' : 'Checkin Icon'}
+                                className="w-5 h-5 mr-2"
+                            />
+                            {checkinAt
+                                ? (checkoutSuccessful ? 'Sudah Absen Keluar' : 'Absen Keluar')
+                                : 'Absen Masuk'}
                         </button>
+
                     </div>
                 </div>
             </header>
