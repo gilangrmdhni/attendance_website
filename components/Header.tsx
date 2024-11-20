@@ -325,7 +325,7 @@ const Header = () => {
                             disabled={Boolean(checkinAt) && buttonDisabled}
                         >
                             <img
-                                src={checkinAt ? '/icons/checkincheckout.png' : '/icons/checkincheckout.png'}
+                                src={checkinAt ? '/icons/checkincheckout.png' : '/icons/login.png'}
                                 alt={checkinAt ? 'Checkout Icon' : 'Checkin Icon'}
                                 className="w-5 h-5 mr-2"
                             />
