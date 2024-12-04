@@ -7,7 +7,6 @@ import { AppDispatch, RootState } from '../../store/store';
 import SuccessModal from '../../components/SuccessModal'; // Import the SuccessModal component
 import ErrorModal from '../../components/ErrorModal'; // Import the ErrorModal component
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import axiosInstance from '@/utils/axiosInstance';
 
 
@@ -29,26 +28,21 @@ const ScanContent = () => {
     const router = useRouter(); // Inisialisasi router
 
     useEffect(() => {
-        // Mendapatkan status approval WFH dari API
         const fetchWFHApprovalStatus = async () => {
             try {
-                const response = await axiosInstance.get('/request-approval/history?page=1&limit=10');
-                const approvals = response.data.body;
-
-                // Filter untuk izin WFH terbaru
-                const latestWFH = approvals.find((item: any) => item.permission === 'WFH' && item.category === 'Izin');
-
-                if (latestWFH) {
-                    setIsWFHApproved(latestWFH.status === 'approved');
+                const response = await axiosInstance.get('/request-approval/wfh-status');
+                
+                if (response.data.code === 200 && response.data.body.status === 'approved') {
+                    setIsWFHApproved(true); // WFH disetujui
                 } else {
-                    setIsWFHApproved(false);
+                    setIsWFHApproved(false); // WFH tidak disetujui atau data tidak ditemukan
                 }
             } catch (error) {
-                console.error('Error fetching approval status:', error);
+                console.error('Error fetching WFH status:', error);
+                setIsWFHApproved(false); // Default jika terjadi error
             }
         };
-
-
+    
         fetchWFHApprovalStatus();
     }, []);
 
@@ -104,11 +98,22 @@ const ScanContent = () => {
             console.error("Missing required fields: Option, location, or file");
             return;
         }
+
+        // Faked absem 
+        // const hardcodedLatitude = "-6.3851685967666985"; 
+        // const hardcodedLongitude = "106.83920712048969"; 
+
+        // const formData = new FormData();
+        // formData.append('checkin_latitude', hardcodedLatitude);
+        // formData.append('checkin_longitude', hardcodedLongitude);
+        // formData.append('picture', selectedFile);
+        
         const formData = new FormData();
         formData.append('checkin_latitude', selectedLocation.latitude.toString());
         formData.append('checkin_longitude', selectedLocation.longitude.toString());
         formData.append('picture', selectedFile);
     
+        
         try {
             if (selectedOption === 'WFO') {
                 await dispatch(checkInWFO(formData)).unwrap();

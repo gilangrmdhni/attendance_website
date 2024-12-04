@@ -9,6 +9,8 @@ const MainContent = () => {
     const [daysInMonth, setDaysInMonth] = useState<(number | null)[]>([]);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [isLunchSubmitted, setIsLunchSubmitted] = useState(false);
+
 
     useEffect(() => {
         const date = new Date(currentYear, currentMonth);
@@ -45,10 +47,25 @@ const MainContent = () => {
         }
     };
 
+    useEffect(() => {
+        const checkLunchStatus = async () => {
+            try {
+                const response = await axiosInstance.get('/lunch/history');
+                if (response.status === 200 && response.data.body.length > 0) {
+                    setIsLunchSubmitted(true); 
+                }
+            } catch (error) {
+                console.error('Gagal memeriksa status lunch:', error);
+            }
+        };
+
+        checkLunchStatus();
+    }, []);
+
+
     const handleConfirm = async () => {
         try {
-            const response = await axiosInstance.post('/lunch/checkin'); // API call with axiosInstance
-
+            const response = await axiosInstance.post('/lunch/checkin');
             if (response.status === 200) {
                 setShowSuccess(true); // Show success popup
             } else {
@@ -84,15 +101,16 @@ const MainContent = () => {
                         />
                     </div>
 
-                    {/* Button */}
-                    <div className="relative z-10 mt-8 flex justify-center">
-                        <button
-                            className="bg-white text-primary-blue font-semibold py-2 px-12 rounded-lg"
-                            onClick={() => setShowConfirmation(true)} // Show confirmation popup
-                        >
-                            Tambah
-                        </button>
-                    </div>
+                    {!isLunchSubmitted && (
+                        <div className="relative z-10 mt-8 flex justify-center">
+                            <button
+                                className="bg-white text-primary-blue font-semibold py-2 px-12 rounded-lg"
+                                onClick={() => setShowConfirmation(true)} 
+                            >
+                                Tambah
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -107,7 +125,7 @@ const MainContent = () => {
                             className="mx-auto w-16 h-16 mb-4" // Menyesuaikan ukuran gambar dan jarak dengan teks
                         />
 
-                        <h3 className="text-lg font-semibold">Apakah kamu yakin ingin mengambil jatah makanan?</h3>
+                        <h3 className="text-lg font-semibold">Apakah kamu ingin memesan makan siang?</h3>
                         <p className="pt-2 text-gray-400 text-sm">Setelah kamu melanjutkan ini, kamu tidak bisa membatalkan pilihanmu.</p>
 
                         <div className="mt-6 flex flex-col space-y-2">
