@@ -9,23 +9,26 @@ const initialState: AuthState = {
     error: null,
 };
 
-export const login = createAsyncThunk('auth/login', async (loginData: { username: string, password: string }, thunkAPI) => {
-    try {
-        const response = await axiosInstance.post<LoginResponse>('/auth/login', {
-            ...loginData,
-        });
-        const token = response.data.meta.token_string;
-        const user = response.data.body;
-        localStorage.setItem('token', token);
-        return { token, user };
-    } catch (error: any) {
-        if (error.response && error.response.data) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
-        }
-        return thunkAPI.rejectWithValue('An unknown error occurred');
-    }
-});
+export const login = createAsyncThunk(
+    'auth/login',
+    async (loginData: LoginPayload, thunkAPI) => {
+        try {
+            const response = await axiosInstance.post<LoginResponse>('/auth/login', loginData);
+            const { token_string: token } = response.data.meta;
+            const user = response.data.body;
 
+            // Simpan token ke localStorage
+            localStorage.setItem('token', token);
+
+            return { token, user };
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                return thunkAPI.rejectWithValue(error.response.data.message);
+            }
+            return thunkAPI.rejectWithValue('An unknown error occurred');
+        }
+    }
+);
 
 const authSlice = createSlice({
     name: 'auth',

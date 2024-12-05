@@ -34,7 +34,7 @@ const Header = () => {
     const fetchTimer = async () => {
         try {
             const response = await axiosInstance.get('/attendance/timer');
-            console.log("API Response:", response.data); // Debugging response
+            console.log("API Response:", response.data); 
 
             if (response.data && response.data.body) {
                 const { checkin, checkout } = response.data.body;
@@ -256,7 +256,7 @@ const Header = () => {
                     <div className="flex flex-col items-start">
                         <h1 className="text-xl font-semibold">{greeting}</h1>
                         <p className="text-lg font-semibold">
-                            {token ? user?.full_name : 'Silahkan login'}
+                            {user?.full_name}
                         </p>
                     </div>
 

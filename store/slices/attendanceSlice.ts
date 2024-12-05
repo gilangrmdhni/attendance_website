@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '../../store/store';
+import axiosInstance from '@/utils/axiosInstance';
 
 export const fetchTimer = createAsyncThunk<string | null>(
   'attendance/fetchTimer',
@@ -18,7 +19,7 @@ export const fetchCheckinStatus = createAsyncThunk<boolean>(
   'attendance/fetchCheckinStatus',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/attendance/status'); // Example endpoint
+      const response = await axiosInstance.get('/attendance/status'); // Example endpoint
       return response.data.body.isWFO; // Assuming you get isWFO status from this endpoint
     } catch (error) {
       return rejectWithValue('Failed to fetch check-in status');

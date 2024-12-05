@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { CheckoutPayload, CheckoutResponse } from '../types/checkoutTypes';
+import axiosInstance from '@/utils/axiosInstance';
 
 // Fungsi checkoutWFO yang diperbarui
 export const checkoutWFO = createAsyncThunk<CheckoutResponse, CheckoutPayload>(
   'checkout/checkoutWFO',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axios.post('https://api.attendance.nuncorp.id/api/attendance/wfo/out', payload);
+      const response = await axiosInstance.post('/attendance/wfo/out', payload);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to checkout WFO');
@@ -20,7 +21,7 @@ export const checkoutWFAWFH = createAsyncThunk<CheckoutResponse, CheckoutPayload
   'checkout/checkoutWFAWFH',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axios.post('https://api.attendance.nuncorp.id/api/attendance/wfa/out', payload);
+      const response = await axiosInstance.post('/attendance/wfa/out', payload);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to checkout WFA/WFH');
