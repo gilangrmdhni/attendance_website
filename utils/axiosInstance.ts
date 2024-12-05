@@ -20,17 +20,15 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-    (response) => response, // Handle successful responses
+    (response) => response, 
     (error) => {
         if (error.response) {
             const { status, data } = error.response;
 
             if (status === 401 && data?.message === 'Token expired') {
-                // Hapus token dan state user
                 localStorage.removeItem('token');
                 store.dispatch(logout());
 
-                // Redirect ke halaman login hanya jika berada di sisi klien
                 if (typeof window !== 'undefined') {
                     router.push('/login');
                 }
